@@ -394,6 +394,30 @@
             <button onclick="window.setDiscount('flat', 200)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-₹200</button>
             <button onclick="window.setDiscount('pct', 5)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-5%</button>
             <button onclick="window.setDiscount('pct', 10)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-10%</button>
+            <button onclick="window.setDiscount('pct', 15)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-15%</button>
+            <button onclick="window.setDiscount('pct', 20)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-20%</button>
+          </div>
+          <!-- Custom Exact Rupee Discount Input -->
+          <div class="flex items-center gap-2 pt-1 border-t border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 shrink-0 font-medium">Custom ₹:</span>
+            <div class="relative flex-1">
+              <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">₹</span>
+              <input 
+                type="number" 
+                id="customDiscountInput" 
+                min="0" 
+                placeholder="Enter exact ₹ discount" 
+                oninput="window.handleCustomDiscount(this.value)" 
+                class="w-full bg-neutral-900 border border-neutral-700/80 rounded-lg pl-6 pr-2 py-1 text-xs text-neutral-100 font-mono-num focus:outline-none focus:border-amber-500"
+              >
+            </div>
+            <button 
+              type="button" 
+              onclick="window.setDiscount('flat', 0)" 
+              class="px-2 py-1 text-[11px] text-neutral-400 hover:text-rose-400 bg-neutral-900 border border-neutral-800 rounded-lg transition"
+            >
+              Clear
+            </button>
           </div>
         </div>
 
@@ -1376,6 +1400,9 @@
       if (document.getElementById('custNameInput')) document.getElementById('custNameInput').value = '';
       if (document.getElementById('custPhoneInput')) document.getElementById('custPhoneInput').value = '';
       if (document.getElementById('cashGivenInput')) document.getElementById('cashGivenInput').value = '';
+      if (document.getElementById('customDiscountInput')) document.getElementById('customDiscountInput').value = '';
+      const disp = document.getElementById('appliedDiscountDisplay');
+      if (disp) disp.innerText = '₹0 off';
 
       closeCheckoutSheet();
       updateFloatingCart();
@@ -2133,6 +2160,14 @@
 
     window.openCheckoutSheet = function() {
       renderCheckoutCartItems();
+      const cashBox = document.getElementById('cashCalculatorBox');
+      if (cashBox) {
+        if (checkoutPayMode === 'upi') {
+          cashBox.classList.add('hidden');
+        } else {
+          cashBox.classList.remove('hidden');
+        }
+      }
       document.getElementById('checkoutSheet')?.classList.remove('hidden');
     };
 
@@ -2142,6 +2177,10 @@
 
     window.clearActiveCart = function() {
       cart = [];
+      activeDiscount = { type: 'flat', value: 0 };
+      if (document.getElementById('customDiscountInput')) document.getElementById('customDiscountInput').value = '';
+      const disp = document.getElementById('appliedDiscountDisplay');
+      if (disp) disp.innerText = '₹0 off';
       updateFloatingCart();
       renderCrackerCards();
       closeCheckoutSheet();
@@ -2150,9 +2189,21 @@
 
     window.setDiscount = function(type, val) {
       activeDiscount = { type, value: val };
+      const customInput = document.getElementById('customDiscountInput');
+      if (customInput) {
+        customInput.value = (type === 'flat' && val > 0) ? val : '';
+      }
       renderCheckoutCartItems();
       const disp = document.getElementById('appliedDiscountDisplay');
       if (disp) disp.innerText = type === 'pct' ? `${val}% off` : `₹${val} off`;
+    };
+
+    window.handleCustomDiscount = function(val) {
+      const num = Math.max(0, parseFloat(val) || 0);
+      activeDiscount = { type: 'flat', value: num };
+      renderCheckoutCartItems();
+      const disp = document.getElementById('appliedDiscountDisplay');
+      if (disp) disp.innerText = `₹${num} off`;
     };
 
     window.setPayMode = function(mode) {
@@ -2168,6 +2219,19 @@
           }
         }
       });
+
+      const cashBox = document.getElementById('cashCalculatorBox');
+      if (cashBox) {
+        if (mode === 'upi') {
+          cashBox.classList.add('hidden');
+          const cashGivenInput = document.getElementById('cashGivenInput');
+          if (cashGivenInput) cashGivenInput.value = '';
+          const cashChangeDisplay = document.getElementById('cashChangeDisplay');
+          if (cashChangeDisplay) cashChangeDisplay.innerText = '₹0';
+        } else {
+          cashBox.classList.remove('hidden');
+        }
+      }
     };
 
     window.calcCashChange = calcCashChange;
