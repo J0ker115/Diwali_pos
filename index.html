@@ -1360,6 +1360,7 @@
       };
 
       /* Deduct stock locally */
+      const soldItems = [...cart];
       cart.forEach(item => {
         const prod = products.find(p => p.id === item.id);
         if (prod) prod.stock = Math.max(0, prod.stock - item.qty);
@@ -1370,16 +1371,28 @@
       sales.unshift(invoice);
       persistLocal(STORAGE_KEYS.SALES, sales);
 
-      /* Render updated state */
+      /* Reset Cart & Form Fields immediately before re-rendering */
+      cart = [];
+      activeDiscount = { type: 'flat', value: 0 };
+      if (document.getElementById('custNameInput')) document.getElementById('custNameInput').value = '';
+      if (document.getElementById('custPhoneInput')) document.getElementById('custPhoneInput').value = '';
+      if (document.getElementById('cashGivenInput')) document.getElementById('cashGivenInput').value = '';
+      if (document.getElementById('customDiscountInput')) document.getElementById('customDiscountInput').value = '';
+      const disp = document.getElementById('appliedDiscountDisplay');
+      if (disp) disp.innerText = '₹0 off';
+
+      /* Re-render screens with fresh empty cart state */
       renderStockView();
       renderCrackerCards();
       renderSummaryView();
+      updateFloatingCart();
+      closeCheckoutSheet();
 
       /* Sync with Firebase */
       if (db) {
         try {
           await setDoc(doc(db, 'sales', invoice.id), invoice);
-          for (const item of cart) {
+          for (const item of soldItems) {
             const p = products.find(prod => prod.id === item.id);
             if (p) await updateDoc(doc(db, 'products', item.id), { stock: p.stock });
           }
@@ -1391,21 +1404,8 @@
       await logAudit(
         'bill', 
         `Bill #${invoiceNum} (${invoice.customer.name})`, 
-        `₹${grandTotal} (${checkoutPayMode.toUpperCase()}), ${cart.reduce((s,i) => s + i.qty, 0)} boxes by ${currentUser ? currentUser.name : 'Staff'}`
+        `₹${grandTotal} (${checkoutPayMode.toUpperCase()}), ${soldItems.reduce((s,i) => s + i.qty, 0)} boxes by ${currentUser ? currentUser.name : 'Staff'}`
       );
-
-      /* Reset Cart */
-      cart = [];
-      activeDiscount = { type: 'flat', value: 0 };
-      if (document.getElementById('custNameInput')) document.getElementById('custNameInput').value = '';
-      if (document.getElementById('custPhoneInput')) document.getElementById('custPhoneInput').value = '';
-      if (document.getElementById('cashGivenInput')) document.getElementById('cashGivenInput').value = '';
-      if (document.getElementById('customDiscountInput')) document.getElementById('customDiscountInput').value = '';
-      const disp = document.getElementById('appliedDiscountDisplay');
-      if (disp) disp.innerText = '₹0 off';
-
-      closeCheckoutSheet();
-      updateFloatingCart();
 
       currentReceiptInvoice = invoice;
       renderThermalReceipt(invoice);
