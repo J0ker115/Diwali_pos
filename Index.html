@@ -1,0 +1,3237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Karan Fataka - Diwali Stall POS</title>
+  
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Hide scrollbar for clean mobile swipe */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Smooth drawer slide */
+    .drawer-transition {
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* Safe-area insets for modern mobile screens */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+    }
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 8px);
+    }
+
+    /* Print styles for thermal paper (58mm/80mm) */
+    @media print {
+      body * { visibility: hidden; }
+      #printableReceiptArea, #printableReceiptArea * { visibility: visible; }
+      #printableReceiptArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 320px !important;
+        margin: 0 auto;
+        color: #000 !important;
+        background: #fff !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-neutral-950">
+
+  <!-- ========================================== -->
+  <!-- TOP APP BAR & FESTIVE BRAND HEADER         -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur-xl border-b border-neutral-800/80 pt-safe px-3.5 py-2.5 shadow-lg shadow-black/40">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+      
+      <!-- Stall Branding -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-neutral-950 shadow-md shadow-amber-500/20 flex-shrink-0">
+          <i data-lucide="flame" class="w-5 h-5 fill-neutral-950 stroke-neutral-950"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm font-black tracking-tight text-white truncate" id="brandTitle">Karan Fataka</h1>
+            <button onclick="openStallSettingsModal()" class="text-neutral-400 hover:text-amber-400 p-0.5 rounded-lg active:scale-90 transition">
+              <i data-lucide="edit-3" class="w-3 h-3"></i>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] font-semibold text-neutral-400">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" id="cloudStatusDot"></span>
+            <span class="text-amber-400/90 font-medium truncate" id="brandLocation">Phadke Road</span>
+            <span class="text-neutral-600">&bull;</span>
+            <span class="text-neutral-400 font-mono text-[9px]" id="brandPhone">8879928546</span>
+            <button onclick="openCloudConfigModal()" class="text-[8px] px-1 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold font-mono tracking-tight active:scale-95 transition" id="cloudStatusBadge">CLOUD LIVE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Operator Switcher & Today's Net Indicator -->
+      <div class="flex items-center gap-1.5 flex-shrink-0">
+        <!-- Active User Badge -->
+        <button onclick="openUserModal()" class="flex items-center gap-1.5 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-800 hover:border-amber-500/40 px-2 py-1.5 rounded-xl active:scale-95 transition">
+          <div class="w-5 h-5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-[10px] flex items-center justify-center" id="userAvatarBadge">K</div>
+          <div class="text-left hidden sm:block leading-none">
+            <span class="text-[11px] font-bold text-white max-w-[60px] truncate block" id="headerUserName">Karan</span>
+          </div>
+          <i data-lucide="lock" class="w-3 h-3 text-amber-400"></i>
+        </button>
+
+        <!-- Quick Live Net Total Mini Pill -->
+        <div class="bg-gradient-to-r from-amber-500/10 to-emerald-500/10 border border-amber-500/30 px-2 py-1 rounded-xl text-right">
+          <span class="text-[8px] uppercase tracking-wider font-bold text-neutral-400 block leading-tight">Net Profit</span>
+          <span class="text-xs font-black text-emerald-400 font-mono tracking-tight" id="headerNetSummary">₹0</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN SCROLLABLE CONTENT VIEW CONTAINER     -->
+  <!-- ========================================== -->
+  <main class="flex-1 max-w-md w-full mx-auto pb-28">
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW 1: BILLING (FESTIVE POS TERMINAL)   -->
+    <!-- ---------------------------------------- -->
+    <section id="viewBilling" class="p-3 space-y-3">
+      
+      <!-- Search Bar & Instant Scanner Input -->
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 text-neutral-500 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+        <input 
+          type="text" 
+          id="productSearchInput" 
+          placeholder="Search firecracker (e.g. 5000 ladi, sky shot, anaar)..." 
+          oninput="handleSearch(this.value)"
+          class="w-full pl-9 pr-8 py-2.5 bg-neutral-900/90 border border-neutral-800 focus:border-amber-500/80 rounded-2xl text-xs text-white placeholder-neutral-500 focus:outline-none transition shadow-inner"
+        />
+        <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-0.5">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- Festive Category Quick Pills (Horizontal Swiper) -->
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="categoryPillContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Cracker Cards Grid -->
+      <div id="crackersGrid" class="grid grid-cols-2 gap-2.5 pt-0.5">
+        <!-- Rendered dynamically by JS -->
+      </div>
+      
+      <!-- Empty Search Fallback -->
+      <div id="noProductsFound" class="hidden text-center py-12 px-4 bg-neutral-900/40 border border-dashed border-neutral-800 rounded-3xl">
+        <i data-lucide="sparkles" class="w-8 h-8 text-neutral-600 mx-auto mb-2"></i>
+        <p class="text-xs font-bold text-neutral-400">No firecrackers matched</p>
+        <p class="text-[11px] text-neutral-500 mt-0.5">Try searching by vernacular names like "Ladi", "Phuljhadi", or "Chakkar"</p>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW 2: STOCK & WHOLESALE MARGINS        -->
+    <!-- ---------------------------------------- -->
+    <section id="viewStock" class="hidden p-3 space-y-3">
+      <!-- Stock Header & Actions -->
+      <div class="bg-gradient-to-br from-neutral-900 to-neutral-900/80 border border-neutral-800 p-3.5 rounded-3xl flex items-center justify-between shadow-lg">
+        <div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-amber-400">Inventory & Margins</span>
+          <p class="text-xs text-neutral-400 mt-0.5" id="stockOverviewText">0 items in stall catalogue</p>
+        </div>
+        <button onclick="openProductSheet()" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs rounded-xl shadow-md shadow-amber-500/20 active:scale-95 flex items-center gap-1.5 transition">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Cracker
+        </button>
+      </div>
+
+      <!-- Quick Filter Pills for Stock Status -->
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        <button onclick="filterStockStatus('all')" id="stockFilterAll" class="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 shadow">All Items</button>
+        <button onclick="filterStockStatus('low')" id="stockFilterLow" class="px-3 py-1 rounded-xl text-xs font-semibold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-red-500"></span> Low Stock (&lt;10)
+        </button>
+      </div>
+
+      <!-- Stock Items List with Inline Steppers -->
+      <div id="stockItemsContainer" class="space-y-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW: FREEBIES & COMPLIMENTARY DISPATCH  -->
+    <!-- ---------------------------------------- -->
+    <section id="viewFreebies" class="hidden p-3 space-y-3">
+      <!-- Freebies Header -->
+      <div class="bg-gradient-to-br from-pink-950/40 via-neutral-900 to-neutral-900 border border-pink-500/30 p-3.5 rounded-3xl flex items-center justify-between shadow-lg">
+        <div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-pink-400">Complimentary & Gifts</span>
+          <p class="text-xs text-neutral-400 mt-0.5" id="freebieSummaryTitle">Family, Staff, & Courtesy</p>
+        </div>
+        <button onclick="openFreebieSheet()" class="px-3 py-2 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-black text-xs rounded-xl shadow-md shadow-pink-500/20 active:scale-95 flex items-center gap-1.5 transition">
+          <i data-lucide="gift" class="w-3.5 h-3.5"></i> Add Freebie
+        </button>
+      </div>
+
+      <!-- Freebie Metric Tiles -->
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-neutral-900/90 border border-neutral-800/90 p-2.5 rounded-2xl">
+          <span class="text-[9px] text-neutral-500 block uppercase font-bold">Cost Value</span>
+          <span class="text-sm font-black text-pink-400 font-mono" id="totalFreebieCost">₹0</span>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-800/90 p-2.5 rounded-2xl">
+          <span class="text-[9px] text-neutral-500 block uppercase font-bold">Retail Value</span>
+          <span class="text-sm font-black text-amber-300 font-mono" id="totalFreebieRetail">₹0</span>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-800/90 p-2.5 rounded-2xl">
+          <span class="text-[9px] text-neutral-500 block uppercase font-bold">Boxes Given</span>
+          <span class="text-sm font-black text-white font-mono" id="totalFreebieBoxes">0</span>
+        </div>
+      </div>
+
+      <!-- Freebies History List -->
+      <div id="freebiesCardList" class="space-y-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW 3: OVERHEAD EXPENSES                -->
+    <!-- ---------------------------------------- -->
+    <section id="viewExpenses" class="hidden p-3 space-y-3">
+      <!-- Expenses Header -->
+      <div class="bg-neutral-900 border border-neutral-800 p-3.5 rounded-3xl flex items-center justify-between shadow-lg">
+        <div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-amber-400">Stall Overhead Costs</span>
+          <p class="text-xs text-neutral-400 mt-0.5" id="expenseSummaryTitle">Rent, Diesel, NOC, Wages</p>
+        </div>
+        <button onclick="openExpenseSheet()" class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-amber-400 font-black text-xs rounded-xl active:scale-95 flex items-center gap-1.5 transition">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Log Expense
+        </button>
+      </div>
+
+      <!-- Expense Metric Tiles -->
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-neutral-900/90 border border-neutral-800/90 p-3 rounded-2xl">
+          <span class="text-[10px] text-neutral-500 block uppercase font-bold">Total Overheads</span>
+          <span class="text-lg font-black text-red-400 font-mono" id="totalExpenseAmount">₹0</span>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-800/90 p-3 rounded-2xl">
+          <span class="text-[10px] text-neutral-500 block uppercase font-bold">Total Entries</span>
+          <span class="text-lg font-black text-white font-mono" id="totalExpenseCount">0</span>
+        </div>
+      </div>
+
+      <!-- Expenses Items List -->
+      <div id="expensesCardList" class="space-y-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW 4: AUDIT HISTORY & ACTIVITY LOG     -->
+    <!-- ---------------------------------------- -->
+    <section id="viewHistory" class="hidden p-3 space-y-3">
+      <!-- History Header -->
+      <div class="bg-neutral-900 border border-neutral-800 p-3.5 rounded-3xl flex items-center justify-between shadow-lg">
+        <div>
+          <span class="text-[10px] uppercase font-black tracking-wider text-amber-400">Operational Audit Trail</span>
+          <p class="text-xs text-neutral-400 mt-0.5" id="historyLogCount">0 actions logged</p>
+        </div>
+        <button onclick="clearHistoryLogs()" class="px-2.5 py-1.5 bg-neutral-800/80 hover:bg-red-950/40 text-neutral-400 hover:text-red-400 font-bold text-[11px] rounded-xl border border-neutral-700/80 flex items-center gap-1 active:scale-95 transition">
+          <i data-lucide="trash-2" class="w-3 h-3"></i> Clear Logs
+        </button>
+      </div>
+
+      <!-- Action Type Filter Tabs -->
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        <button onclick="setHistoryFilter('all')" id="histFilterAll" class="px-3 py-1 text-xs font-bold rounded-xl bg-amber-500 text-neutral-950 whitespace-nowrap">All Logs</button>
+        <button onclick="setHistoryFilter('bill')" id="histFilterBill" class="px-3 py-1 text-xs font-semibold rounded-xl bg-neutral-900 text-neutral-300 border border-neutral-800 whitespace-nowrap">Bills & Edits</button>
+        <button onclick="setHistoryFilter('stock')" id="histFilterStock" class="px-3 py-1 text-xs font-semibold rounded-xl bg-neutral-900 text-neutral-300 border border-neutral-800 whitespace-nowrap">Stock Updates</button>
+        <button onclick="setHistoryFilter('expense')" id="histFilterExpense" class="px-3 py-1 text-xs font-semibold rounded-xl bg-neutral-900 text-neutral-300 border border-neutral-800 whitespace-nowrap">Expenses</button>
+      </div>
+
+      <!-- Logs Container -->
+      <div id="historyLogsContainer" class="space-y-2">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- VIEW 5: SUMMARY, INVOICES & REPORTS      -->
+    <!-- ---------------------------------------- -->
+    <section id="viewSummary" class="hidden p-3 space-y-3">
+      <!-- High-Impact Z-Report Card -->
+      <div class="bg-gradient-to-br from-amber-500/20 via-neutral-900 to-neutral-900 border border-amber-500/30 p-4 rounded-3xl shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-[10px] uppercase font-black tracking-wider text-amber-400">Day Settlement & PnL</span>
+            <h2 class="text-xl font-black text-white">Karan Fataka Stall</h2>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300">Live Today</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <div class="bg-neutral-950/60 p-2.5 rounded-2xl border border-neutral-800">
+            <span class="text-[9px] uppercase font-bold text-neutral-400 block">Total Sales</span>
+            <span class="text-base font-black text-white font-mono" id="sumTotalSales">₹0</span>
+          </div>
+          <div class="bg-neutral-950/60 p-2.5 rounded-2xl border border-neutral-800">
+            <span class="text-[9px] uppercase font-bold text-neutral-400 block">True Net Profit</span>
+            <span class="text-base font-black text-emerald-400 font-mono" id="sumNetProfit">₹0</span>
+          </div>
+          <div class="bg-neutral-950/60 p-2.5 rounded-2xl border border-neutral-800">
+            <span class="text-[9px] uppercase font-bold text-neutral-400 block">Cash Collected</span>
+            <span class="text-sm font-black text-amber-300 font-mono" id="sumCashCollection">₹0</span>
+          </div>
+          <div class="bg-neutral-950/60 p-2.5 rounded-2xl border border-neutral-800">
+            <span class="text-[9px] uppercase font-bold text-neutral-400 block">UPI Collection</span>
+            <span class="text-sm font-black text-sky-400 font-mono" id="sumUpiCollection">₹0</span>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-neutral-400 flex items-center justify-between pt-1 border-t border-neutral-800/80">
+          <span>Stall Overheads: <strong class="text-red-400 font-mono" id="sumTotalOverheads">₹0</strong></span>
+          <span>Crackers Sold: <strong class="text-white font-mono" id="sumItemsSold">0 boxes</strong></span>
+        </div>
+        <div class="text-[10px] text-neutral-400 flex items-center justify-between pt-1 border-t border-neutral-800/50">
+          <span>Freebies Given: <strong class="text-pink-400 font-mono" id="sumFreebiesCost">₹0</strong></span>
+          <span>Freebie Boxes: <strong class="text-neutral-300 font-mono" id="sumFreebieBoxes">0 boxes</strong></span>
+        </div>
+      </div>
+
+      <!-- Generated Invoices List with Edit and Reprint -->
+      <div class="space-y-2 pt-1">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-xs font-black uppercase tracking-wider text-neutral-400">Bills Generated Today</h3>
+          <span class="text-[11px] text-neutral-500 font-mono" id="salesCountText">0 bills</span>
+        </div>
+        <div id="salesInvoiceList" class="space-y-2">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FLOATING BOTTOM ACTIVE CART BAR            -->
+  <!-- ========================================== -->
+  <div id="floatingCartBar" class="fixed bottom-16 left-0 right-0 z-30 p-2 max-w-md mx-auto hidden">
+    <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-3 shadow-2xl shadow-amber-500/30 flex items-center justify-between text-neutral-950 active:scale-[0.99] transition cursor-pointer" onclick="openCheckoutSheet()">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-neutral-950 text-amber-400 flex items-center justify-center font-black text-xs shadow-inner">
+          <span id="floatingCartCount">0</span>
+        </div>
+        <div>
+          <span class="text-[11px] uppercase font-black tracking-tight text-neutral-950 block leading-tight">View Active Cart</span>
+          <span class="text-xs text-neutral-950/80 font-medium leading-none" id="floatingCartItemsSub">0 items selected</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-base font-black font-mono tracking-tight" id="floatingCartTotal">₹0</span>
+        <div class="w-6 h-6 rounded-full bg-neutral-950/20 flex items-center justify-center">
+          <i data-lucide="chevron-up" class="w-4 h-4 text-neutral-950"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- DOCKED MOBILE BOTTOM NAVIGATION BAR        -->
+  <!-- ========================================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-800/80 pb-safe shadow-2xl">
+    <div class="max-w-md mx-auto grid grid-cols-6 px-0.5 py-1.5">
+      
+      <!-- 1. Billing -->
+      <button id="navBilling" onclick="switchNav('billing')" class="flex flex-col items-center justify-center py-1 text-amber-400 font-bold active:scale-90 transition">
+        <i data-lucide="receipt" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">Billing</span>
+      </button>
+
+      <!-- 2. Stock -->
+      <button id="navStock" onclick="switchNav('stock')" class="relative flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition">
+        <i data-lucide="boxes" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">Stock</span>
+        <span id="navLowStockDot" class="hidden absolute top-0.5 right-3 w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+      </button>
+
+      <!-- 3. Freebies -->
+      <button id="navFreebies" onclick="switchNav('freebies')" class="flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition">
+        <i data-lucide="gift" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">Freebies</span>
+      </button>
+
+      <!-- 4. Expenses -->
+      <button id="navExpenses" onclick="switchNav('expenses')" class="flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition">
+        <i data-lucide="wallet" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">Expenses</span>
+      </button>
+
+      <!-- 5. History -->
+      <button id="navHistory" onclick="switchNav('history')" class="flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition">
+        <i data-lucide="history" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">History</span>
+      </button>
+
+      <!-- 6. Report -->
+      <button id="navSummary" onclick="switchNav('summary')" class="flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition">
+        <i data-lucide="bar-chart-3" class="w-4 h-4 mb-0.5"></i>
+        <span class="text-[8px] tracking-tight">Report</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM SHEET: ACTIVE CART & CHECKOUT       -->
+  <!-- ========================================== -->
+  <div id="checkoutBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden">
+    <div id="checkoutDrawer" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-neutral-900 border-t border-neutral-800 rounded-t-[32px] shadow-2xl flex flex-col max-h-[92vh] transform translate-y-full drawer-transition">
+      
+      <!-- Drawer Handle & Header -->
+      <div class="pt-3 pb-2.5 px-4 border-b border-neutral-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-amber-400 animate-pulse"></div>
+          <div>
+            <h3 class="font-black text-sm text-white">Active Order Checkout</h3>
+            <p class="text-[10px] text-neutral-400">Phadke Road &bull; Karan Fataka</p>
+          </div>
+        </div>
+        <button onclick="closeCheckoutSheet()" class="w-7 h-7 rounded-full bg-neutral-800 text-neutral-300 flex items-center justify-center hover:text-white active:scale-90">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Scrollable Content -->
+      <div class="overflow-y-auto p-4 space-y-4 no-scrollbar flex-1 text-xs">
+        
+        <!-- Customer Info (Optional) -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Customer Name</label>
+            <input type="text" id="custNameInput" placeholder="Walk-in Customer" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-xs focus:border-amber-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">WhatsApp Phone</label>
+            <input type="tel" id="custPhoneInput" placeholder="10-digit number" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-xs focus:border-amber-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <!-- Selected Cart Items List -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Order Items</span>
+            <button onclick="clearCurrentCart()" class="text-[10px] text-red-400 hover:underline">Clear All</button>
+          </div>
+          <div id="cartItemsList" class="space-y-2 max-h-44 overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 1-Tap Bargain Discount Chips -->
+        <div class="bg-neutral-950/80 p-3 rounded-2xl border border-neutral-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase text-neutral-400">Festival Bargain / Discount</span>
+            <span class="text-[10px] font-bold text-amber-400" id="cartDiscountLabel">₹0 off</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5">
+            <button onclick="applyDiscountPreset(50, 'flat')" class="py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-[11px] font-bold text-neutral-200 active:scale-95">-₹50</button>
+            <button onclick="applyDiscountPreset(100, 'flat')" class="py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-[11px] font-bold text-neutral-200 active:scale-95">-₹100</button>
+            <button onclick="applyDiscountPreset(200, 'flat')" class="py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-[11px] font-bold text-neutral-200 active:scale-95">-₹200</button>
+            <button onclick="applyDiscountPreset(5, 'pct')" class="py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-[11px] font-bold text-neutral-200 active:scale-95">5%</button>
+            <button onclick="applyDiscountPreset(10, 'pct')" class="py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-[11px] font-bold text-neutral-200 active:scale-95">10%</button>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <input type="number" id="customDiscountVal" placeholder="Custom Discount (₹)" oninput="handleCustomDiscount(this.value)" class="w-full px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-amber-500" />
+            <button onclick="resetDiscount()" class="px-3 py-1.5 bg-neutral-800 text-neutral-400 hover:text-white rounded-xl text-xs font-semibold">Reset</button>
+          </div>
+        </div>
+
+        <!-- Payment Mode Selector -->
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1.5">Payment Method</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setPayMode('cash')" id="payBtnCash" class="py-2.5 rounded-xl border border-amber-500 bg-amber-500/20 text-amber-300 font-black text-xs flex flex-col items-center justify-center gap-1 active:scale-95">
+              <i data-lucide="banknote" class="w-4 h-4"></i> Cash
+            </button>
+            <button onclick="setPayMode('upi')" id="payBtnUpi" class="py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-neutral-400 font-bold text-xs flex flex-col items-center justify-center gap-1 active:scale-95">
+              <i data-lucide="qr-code" class="w-4 h-4"></i> UPI / QR
+            </button>
+            <button onclick="setPayMode('split')" id="payBtnSplit" class="py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-neutral-400 font-bold text-xs flex flex-col items-center justify-center gap-1 active:scale-95">
+              <i data-lucide="layers" class="w-4 h-4"></i> Split
+            </button>
+          </div>
+        </div>
+
+        <!-- Cash Tender Helper -->
+        <div id="cashTenderBox" class="bg-neutral-950/80 p-3 rounded-2xl border border-neutral-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase text-neutral-400">Cash Received from Customer</span>
+            <span class="text-[11px] font-mono text-emerald-400 font-black" id="changeReturnLabel">Change: ₹0</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="setTenderExact()" class="py-1 bg-neutral-900 border border-neutral-800 rounded-lg text-[10px] font-bold text-amber-300">Exact</button>
+            <button onclick="setTenderAmount(500)" class="py-1 bg-neutral-900 border border-neutral-800 rounded-lg text-[10px] font-bold text-neutral-300">₹500</button>
+            <button onclick="setTenderAmount(1000)" class="py-1 bg-neutral-900 border border-neutral-800 rounded-lg text-[10px] font-bold text-neutral-300">₹1,000</button>
+            <button onclick="setTenderAmount(2000)" class="py-1 bg-neutral-900 border border-neutral-800 rounded-lg text-[10px] font-bold text-neutral-300">₹2,000</button>
+          </div>
+          <input type="number" id="cashGivenInput" placeholder="Enter Cash Given (e.g. 1500)" oninput="calcChangeReturn(this.value)" class="w-full px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-amber-500" />
+        </div>
+
+      </div>
+
+      <!-- Docked Drawer Footer with Complete Bill Action -->
+      <div class="p-4 border-t border-neutral-800 bg-neutral-950 pb-safe space-y-2.5">
+        <div class="flex items-baseline justify-between px-1">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-neutral-400 block">Total Payable</span>
+            <span class="text-[11px] text-neutral-500 line-through" id="checkoutGrossSubtotal">₹0</span>
+          </div>
+          <span class="text-2xl font-black text-amber-400 font-mono tracking-tight" id="checkoutGrandTotal">₹0</span>
+        </div>
+
+        <button onclick="processOrderCheckout()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 active:scale-[0.98] text-neutral-950 font-black text-xs rounded-2xl shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition">
+          <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+          <span>COMPLETE BILL & PRINT RECEIPT</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM SHEET: EDIT GENERATED BILL          -->
+  <!-- ========================================== -->
+  <div id="editBillBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden">
+    <div id="editBillDrawer" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-neutral-900 border-t border-neutral-800 rounded-t-[32px] shadow-2xl flex flex-col max-h-[92vh] transform translate-y-full drawer-transition text-xs">
+      
+      <!-- Drawer Header -->
+      <div class="pt-3 pb-2.5 px-4 border-b border-neutral-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-orange-400 animate-pulse"></div>
+          <div>
+            <h3 class="font-black text-sm text-white" id="editBillTitle">Edit Bill #PK-0000</h3>
+            <p class="text-[10px] text-neutral-400" id="editBillOperatorSub">Created by Staff</p>
+          </div>
+        </div>
+        <button onclick="closeEditBillDrawer()" class="w-7 h-7 rounded-full bg-neutral-800 text-neutral-300 flex items-center justify-center hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Body -->
+      <div class="overflow-y-auto p-4 space-y-3.5 no-scrollbar flex-1">
+        <!-- Customer Details -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Customer Name</label>
+            <input type="text" id="editBillCustName" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Phone Number</label>
+            <input type="tel" id="editBillCustPhone" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <!-- Editable Items -->
+        <div>
+          <label class="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-1.5">Purchased Crackers (Quantities)</label>
+          <div id="editBillItemsList" class="space-y-2 divide-y divide-neutral-800/60">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Add Cracker Inside Edit Bill -->
+        <div class="bg-neutral-950 p-2.5 rounded-2xl border border-neutral-800 space-y-1.5">
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase">Add Another Cracker</label>
+          <div class="flex gap-2">
+            <select id="editBillProductSelect" class="flex-1 bg-neutral-900 border border-neutral-800 text-white rounded-xl px-2.5 py-2 text-xs focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+            <button onclick="addItemToActiveEditBill()" class="px-3 py-2 bg-amber-500 text-neutral-950 font-black rounded-xl text-xs active:scale-95 flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+            </button>
+          </div>
+        </div>
+
+        <!-- Discount and Mode -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Discount (₹)</label>
+            <input type="number" id="editBillDiscount" min="0" oninput="calcEditBillTotals()" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono text-xs focus:border-amber-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Payment Mode</label>
+            <select id="editBillPayMode" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-xs focus:border-amber-500 focus:outline-none">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI / QR</option>
+              <option value="split">Split</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Reason for Audit -->
+        <div class="bg-red-950/20 border border-red-500/30 p-2.5 rounded-2xl">
+          <label class="block text-[10px] font-black text-red-400 uppercase mb-1 flex items-center gap-1">
+            <i data-lucide="alert-circle" class="w-3 h-3"></i>
+            Reason for Edit (Mandatory) *
+          </label>
+          <input type="text" id="editBillReason" placeholder="Enter reason (e.g. Customer changed mind, incorrect qty)" class="w-full px-2.5 py-2 bg-neutral-950 border border-red-500/40 rounded-xl text-white text-xs focus:border-amber-500 focus:outline-none placeholder-neutral-500" required />
+          <p class="text-[9px] text-neutral-400 mt-1">This explanation will be permanently recorded in the audit history with your name.</p>
+        </div>
+      </div>
+
+      <!-- Footer Save Action -->
+      <div class="p-4 border-t border-neutral-800 bg-neutral-950 pb-safe space-y-2">
+        <div class="flex items-baseline justify-between px-1">
+          <span class="text-xs uppercase font-bold text-neutral-400">Recalculated Total</span>
+          <span class="text-xl font-black text-amber-400 font-mono" id="editBillGrandTotal">₹0</span>
+        </div>
+        <button onclick="saveActiveEditedBill()" class="w-full py-3 bg-amber-500 text-neutral-950 font-black text-xs rounded-2xl active:scale-98 shadow-xl flex items-center justify-center gap-2">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>UPDATE BILL & SYNC INVENTORY STOCK</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM SHEET: ADD/EDIT CRACKER STOCK       -->
+  <!-- ========================================== -->
+  <div id="productSheetBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden">
+    <div id="productSheetDrawer" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-neutral-900 border-t border-neutral-800 rounded-t-[32px] shadow-2xl p-4 transform translate-y-full drawer-transition text-xs space-y-3 pb-safe">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <h3 class="font-black text-sm text-white" id="productSheetTitle">Add New Firecracker</h3>
+        <button onclick="closeProductSheet()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form id="productEntryForm" onsubmit="handleProductSave(event)" class="space-y-2.5">
+        <input type="hidden" id="entryProdId" />
+        
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Cracker Name *</label>
+          <input type="text" id="entryProdName" required placeholder="e.g. 5000 Wala Deluxe Ladi" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-bold text-neutral-400 uppercase">Category *</label>
+              <button type="button" onclick="promptAddNewCategory()" class="text-[9px] font-bold text-amber-400 hover:underline">+ New Cat</button>
+            </div>
+            <select id="entryProdCat" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Initial Stock (Boxes)</label>
+            <input type="number" id="entryProdStock" min="0" required value="20" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Wholesale Cost (₹)</label>
+            <input type="number" id="entryProdCost" min="0" required placeholder="Cost Price" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Selling Rate (₹)</label>
+            <input type="number" id="entryProdSell" min="0" required placeholder="Sale Price" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono focus:outline-none" />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-amber-500 text-neutral-950 font-black rounded-2xl shadow-lg active:scale-95">SAVE TO CATALOGUE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM SHEET: LOG OVERHEAD EXPENSE         -->
+  <!-- ========================================== -->
+  <div id="expenseSheetBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden">
+    <div id="expenseSheetDrawer" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-neutral-900 border-t border-neutral-800 rounded-t-[32px] shadow-2xl p-4 transform translate-y-full drawer-transition text-xs space-y-3 pb-safe">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <h3 class="font-black text-sm text-white">Log Stall Overhead</h3>
+        <button onclick="closeExpenseSheet()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form id="expenseForm" onsubmit="handleExpenseSave(event)" class="space-y-2.5">
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Expense Type</label>
+          <select id="sheetExpCategory" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none">
+            <option value="Generator & Diesel">Generator & Diesel Fuel</option>
+            <option value="Stall Ground Rent">Stall Ground Rent</option>
+            <option value="Police / Fire NOC">Police / Fire NOC & Permits</option>
+            <option value="Helper Daily Wages">Helper Daily Wages</option>
+            <option value="Tempo / Cartage">Tempo / Cartage Freight</option>
+            <option value="Chai & Snacks">Chai & Staff Snacks</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Amount (₹) *</label>
+            <input type="number" id="sheetExpAmount" required min="1" placeholder="e.g. 500" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Paid Via</label>
+            <select id="sheetExpMode" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none">
+              <option value="cash">Cash In Hand</option>
+              <option value="upi">UPI</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Note (Optional)</label>
+          <input type="text" id="sheetExpNotes" placeholder="e.g. 10L diesel for generator" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none" />
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-lg active:scale-95">LOG EXPENSE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM SHEET: LOG FREEBIE / COMPLIMENTARY  -->
+  <!-- ========================================== -->
+  <div id="freebieSheetBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden">
+    <div id="freebieSheetDrawer" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-neutral-900 border-t border-neutral-800 rounded-t-[32px] shadow-2xl p-4 transform translate-y-full drawer-transition text-xs space-y-3 pb-safe max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center">
+            <i data-lucide="gift" class="w-3.5 h-3.5"></i>
+          </div>
+          <h3 class="font-black text-sm text-white">Give Freebie / Gift</h3>
+        </div>
+        <button onclick="closeFreebieSheet()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="overflow-y-auto space-y-3 flex-1 no-scrollbar pr-0.5">
+        <!-- Recipient Information -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Given To *</label>
+            <input type="text" id="freebieRecipientInput" required placeholder="e.g. Chacha, Suresh (Helper), Police" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-pink-500" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Category *</label>
+            <select id="freebieCategorySelect" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-pink-500">
+              <option value="Family">Family Member</option>
+              <option value="Staff">Staff / Helper Bonus</option>
+              <option value="Friends">Friend / Neighbor</option>
+              <option value="Courtesy / VIP">Courtesy / VIP / Police</option>
+              <option value="Sample / Tasting">Testing / Sample</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cracker Selection for Freebie -->
+        <div class="bg-neutral-950 p-2.5 rounded-2xl border border-neutral-800 space-y-2">
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase">Select Firecracker to Give</label>
+          <div class="flex gap-2">
+            <select id="freebieProductSelect" class="flex-1 bg-neutral-900 border border-neutral-800 text-white rounded-xl px-2.5 py-2 text-xs focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+            <input type="number" id="freebieItemQtyInput" min="1" value="1" placeholder="Qty" class="w-16 bg-neutral-900 border border-neutral-800 text-white rounded-xl px-2 py-2 text-xs font-mono text-center focus:outline-none" />
+            <button type="button" onclick="addCrackerToFreebieCart()" class="px-3 py-2 bg-pink-500 text-white font-black rounded-xl text-xs active:scale-95 flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Items for this Dispatch -->
+        <div>
+          <span class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Items to Dispatch</span>
+          <div id="freebieItemsContainer" class="space-y-1.5 max-h-36 overflow-y-auto">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Notes / Occasion</label>
+          <input type="text" id="freebieNotesInput" placeholder="e.g. Diwali gift pack, festival bonus" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:outline-none focus:border-pink-500" />
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-neutral-800 flex-shrink-0 space-y-2">
+        <div class="flex items-center justify-between text-xs px-1">
+          <span class="text-neutral-400">Total Wholesale Cost:</span>
+          <span class="font-mono font-black text-pink-400" id="freebieDrawerTotalCost">₹0</span>
+        </div>
+        <button onclick="handleFreebieDispatchSave()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-black rounded-2xl shadow-lg active:scale-95 flex items-center justify-center gap-2">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>CONFIRM FREEBIE & DEDUCT STOCK</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: FAST OPERATOR LOGIN & SWITCHER      -->
+  <!-- ========================================== -->
+  <div id="userModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 text-neutral-100 w-full max-w-sm rounded-3xl p-4 shadow-2xl space-y-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-black text-xs text-white">Staff Login & Authentication</h4>
+            <p class="text-[10px] text-neutral-400">Password required to record activities</p>
+          </div>
+        </div>
+        <button onclick="closeUserModal()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- Currently Logged In -->
+      <div class="bg-neutral-950 p-2.5 rounded-2xl border border-neutral-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-amber-500 text-neutral-950 font-black text-xs flex items-center justify-center" id="modalActiveInitial">K</div>
+          <div>
+            <span class="text-[9px] uppercase font-bold text-neutral-500">Currently Operating</span>
+            <p class="text-xs font-bold text-white"><span id="modalActiveName">Karan</span></p>
+          </div>
+        </div>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">Active</span>
+      </div>
+
+      <!-- Select Account to Login Form -->
+      <div class="space-y-2">
+        <label class="block text-[10px] font-bold text-neutral-400 uppercase">Select Staff Account</label>
+        <select id="loginUserSelect" onchange="handleLoginUserChange()" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500">
+          <!-- Populated by JS -->
+        </select>
+
+        <div>
+          <label class="block text-[10px] font-bold text-neutral-400 uppercase mb-1">Enter Password / PIN *</label>
+          <div class="relative">
+            <input type="password" id="loginPinInput" placeholder="Enter PIN/Password" class="w-full pl-3 pr-9 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-amber-500" />
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white">
+              <i data-lucide="eye" id="loginEyeIcon" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <p class="text-[9px] text-neutral-500 mt-1">Default PIN: Karan (1234)</p>
+        </div>
+
+        <button onclick="handleLoginSubmit()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black text-xs rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
+          <i data-lucide="key-round" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+          <span>VERIFY & SWITCH OPERATOR</span>
+        </button>
+      </div>
+
+      <!-- User Management Accordion -->
+      <div class="pt-2 border-t border-neutral-800">
+        <button onclick="toggleOwnerStaffPanel()" class="w-full py-1 text-left flex items-center justify-between text-[11px] font-bold text-neutral-400 hover:text-amber-400">
+          <span>⚙️ Add / Manage Users</span>
+          <i data-lucide="chevron-down" id="ownerPanelChevron" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <div id="ownerStaffPanel" class="hidden mt-2 p-2.5 bg-neutral-950 rounded-2xl border border-neutral-800 space-y-2">
+          <span class="text-[9px] text-neutral-400 block font-semibold">Add New Person / Counter Account</span>
+          <div class="grid grid-cols-2 gap-1.5">
+            <input type="text" id="newStaffName" placeholder="Name (e.g. Amit)" class="px-2 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white focus:outline-none" />
+            <input type="text" id="newStaffPin" placeholder="PIN/Password" class="px-2 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white font-mono focus:outline-none" />
+          </div>
+          <button onclick="addNewStaffMember()" class="w-full py-1.5 bg-amber-500 text-neutral-950 font-black text-xs rounded-lg active:scale-95">Add Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD CUSTOM CATEGORY                 -->
+  <!-- ========================================== -->
+  <div id="newCategoryModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 text-neutral-100 w-full max-w-xs rounded-3xl p-4 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <h4 class="font-black text-xs text-white">Create Cracker Category</h4>
+        <button onclick="closeCategoryModal()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div>
+          <label class="block text-[10px] text-neutral-400 uppercase font-bold mb-1">Category Name *</label>
+          <input type="text" id="customCatInput" placeholder="e.g. Rockets, Roll Caps, Green Crackers" class="w-full px-2.5 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white focus:border-amber-500 focus:outline-none" />
+        </div>
+        <p class="text-[10px] text-neutral-500">This will be added immediately to the inventory category list and billing filter pills.</p>
+        <button onclick="saveNewCategory()" class="w-full py-2.5 bg-amber-500 text-neutral-950 font-black rounded-xl text-xs active:scale-95">ADD CATEGORY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: STALL SETTINGS                      -->
+  <!-- ========================================== -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 text-neutral-100 w-full max-w-xs rounded-3xl p-4 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <h4 class="font-black text-xs text-white">Stall Branding</h4>
+        <button onclick="closeStallSettingsModal()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div>
+          <label class="block text-[10px] text-neutral-400 mb-0.5">Stall Name</label>
+          <input type="text" id="setStallName" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white" />
+        </div>
+        <div>
+          <label class="block text-[10px] text-neutral-400 mb-0.5">Location</label>
+          <input type="text" id="setStallLoc" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white" />
+        </div>
+        <div>
+          <label class="block text-[10px] text-neutral-400 mb-0.5">Contact Phone</label>
+          <input type="text" id="setStallPhone" class="w-full px-2.5 py-1.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white" />
+        </div>
+        <button onclick="saveStallSettings()" class="w-full py-2 bg-amber-500 text-neutral-950 font-black rounded-xl text-xs active:scale-95">Save Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: GITHUB PAGES & FIREBASE CLOUD SETUP -->
+  <!-- ========================================== -->
+  <div id="cloudConfigModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 text-neutral-100 w-full max-w-sm rounded-3xl p-4 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-neutral-800">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <i data-lucide="cloud" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-black text-xs text-white">GitHub Pages & Firebase Sync</h4>
+            <p class="text-[10px] text-neutral-400">Connect cloud database across devices</p>
+          </div>
+        </div>
+        <button onclick="closeCloudConfigModal()" class="p-1 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <p class="text-[11px] text-neutral-300 leading-relaxed">
+          When hosted on GitHub Pages, paste your Firebase web project config JSON below to sync bills, stock, and expenses in real-time across all stall phones:
+        </p>
+        <div>
+          <label class="block text-[10px] text-neutral-400 font-bold uppercase mb-1">Firebase Config (JSON or JS Object)</label>
+          <textarea id="firebaseConfigInput" rows="5" placeholder='{"apiKey":"AIza...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}' class="w-full p-2 bg-neutral-950 border border-neutral-800 rounded-xl text-white font-mono text-[10px] focus:border-amber-500 focus:outline-none leading-tight"></textarea>
+        </div>
+        <div class="bg-amber-500/10 border border-amber-500/20 p-2 rounded-xl text-[10px] text-amber-300 space-y-1">
+          <p class="font-bold">💡 Pro-Tip for Multi-Device Use:</p>
+          <p class="text-neutral-400">You can also paste your config directly into <code class="text-amber-300 font-mono">CUSTOM_FIREBASE_CONFIG</code> in the code before pushing to GitHub so helper phones connect automatically without setup.</p>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button onclick="saveCloudConfig()" class="flex-1 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 font-black rounded-xl text-xs active:scale-95 shadow-md">SAVE & CONNECT</button>
+          <button onclick="clearCloudConfig()" class="px-3 py-2 bg-neutral-800 text-neutral-400 hover:text-red-400 rounded-xl text-xs font-semibold">RESET</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: POST-SALE THERMAL RECEIPT PREVIEW   -->
+  <!-- ========================================== -->
+  <div id="receiptModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-3">
+    <div class="bg-white text-neutral-950 w-full max-w-xs rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Receipt Printable Area -->
+      <div id="printableReceiptArea" class="p-4 overflow-y-auto font-mono text-[11px] leading-tight space-y-2 bg-white text-neutral-900 flex-1">
+        <div class="text-center space-y-1 pb-2 border-b border-dashed border-neutral-300">
+          <h2 class="font-black text-sm tracking-tight" id="rcptStallName">KARAN FATAKA</h2>
+          <p class="text-[10px] text-neutral-600" id="rcptStallLoc">Phadke Road</p>
+          <p class="text-[10px] text-neutral-600">Mob: <span id="rcptStallPhone">8879928546</span></p>
+          <p class="text-[9px] text-neutral-500 font-sans mt-0.5">🪔 Happy Diwali &bull; Safe Celebrations 🪔</p>
+        </div>
+
+        <div class="text-[10px] text-neutral-600 space-y-0.5 py-1 border-b border-dashed border-neutral-300">
+          <div class="flex justify-between">
+            <span>Bill: <strong id="rcptInvoiceId">#PK-0000</strong></span>
+            <span id="rcptDate">24-Oct 19:30</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Customer: <span id="rcptCustName">Walk-in</span></span>
+            <span class="uppercase" id="rcptPayMode">CASH</span>
+          </div>
+          <div class="flex justify-between text-[9px] text-neutral-500">
+            <span>Billed by: <span id="rcptOperator">Karan</span></span>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <table class="w-full text-[10px] py-1 border-b border-dashed border-neutral-300">
+          <thead>
+            <tr class="border-b border-neutral-200 text-left text-[9px] text-neutral-500">
+              <th class="py-1">ITEM</th>
+              <th class="text-center">QTY</th>
+              <th class="text-right">PRICE</th>
+              <th class="text-right">AMT</th>
+            </tr>
+          </thead>
+          <tbody id="rcptItemsTbody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <!-- Totals Breakdown -->
+        <div class="space-y-1 text-[10px] pt-1 border-b border-dashed border-neutral-300">
+          <div class="flex justify-between">
+            <span>Subtotal:</span>
+            <span id="rcptSubtotal">₹0</span>
+          </div>
+          <div class="flex justify-between text-neutral-600" id="rcptDiscountRow">
+            <span>Bargain Discount:</span>
+            <span id="rcptDiscount">-₹0</span>
+          </div>
+          <div class="flex justify-between text-xs font-black pt-1 border-t border-neutral-200">
+            <span>FINAL AMOUNT:</span>
+            <span id="rcptGrandTotal">₹0</span>
+          </div>
+        </div>
+
+        <div class="text-[9px] text-center text-neutral-500 pt-1">
+          <p>No exchange or return on fired crackers.</p>
+          <p class="font-bold text-neutral-700 mt-0.5">THANK YOU FOR YOUR VISIT!</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="p-3 bg-neutral-100 border-t border-neutral-200 space-y-2 no-print">
+        <button onclick="sendWhatsAppReceipt()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>SEND ON WHATSAPP</span>
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="window.print()" class="py-2 px-3 bg-neutral-900 active:scale-95 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Thermal
+          </button>
+          <button onclick="closeReceiptModal()" class="py-2 px-3 bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs rounded-xl">
+            Next Customer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Toast Alert Notification -->
+  <div id="toastNotification" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-400 text-neutral-950 font-black text-xs px-4 py-2 rounded-2xl shadow-2xl shadow-amber-500/30 transform -translate-y-16 transition-all duration-300 pointer-events-none flex items-center gap-2">
+    <i data-lucide="sparkles" class="w-4 h-4"></i>
+    <span id="toastMsg">Ready</span>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- REAL-TIME CLOUD DATABASE & APPLICATION LOGIC -->
+  <!-- ========================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, 
+      signInAnonymously, 
+      signInWithCustomToken, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      deleteDoc, 
+      onSnapshot, 
+      collection, 
+      getDocs 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Firebase Web App configuration embedded for zero-setup multi-phone sync on GitHub Pages
+    const CUSTOM_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCSkbzZGjq9hP524RBHS78AyZb6j3ih2fE",
+      authDomain: "diwali-final.firebaseapp.com",
+      projectId: "diwali-final",
+      storageBucket: "diwali-final.firebasestorage.app",
+      messagingSenderId: "665781684974",
+      appId: "1:665781684974:web:eb980884e96ae5adee81ff"
+    };
+
+    // Application ID and Cloud Environment Config
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'karan-fataka-stall-pos';
+
+    function getActiveFirebaseConfig() {
+      if (CUSTOM_FIREBASE_CONFIG && typeof CUSTOM_FIREBASE_CONFIG === 'object') {
+        return CUSTOM_FIREBASE_CONFIG;
+      }
+      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try { return JSON.parse(__firebase_config); } catch (e) {}
+      }
+      const savedConfig = localStorage.getItem('karan_fataka_firebase_config');
+      if (savedConfig) {
+        try { return JSON.parse(savedConfig); } catch (e) {}
+      }
+      return null;
+    }
+
+    let firebaseConfig = getActiveFirebaseConfig();
+
+    let app, auth, db;
+    let currentUserAuth = null;
+
+    // Application In-Memory State synced in real time
+    let products = [];
+    let sales = [];
+    let expenses = [];
+    let freebies = [];
+    let auditLogs = [];
+    let freebieStagingItems = [];
+    let categories = ['Phuljhadi', 'Anaar', 'Chakkar', 'SkyShots', 'Ladi', 'GiftBoxes'];
+    let cart = [];
+    let activeNav = 'billing';
+    let currentCategory = 'All';
+    let currentStockStatus = 'all';
+    let currentHistoryFilter = 'all';
+    let checkoutPayMode = 'cash';
+    let currentReceiptInvoice = null;
+    let activeEditInvoice = null;
+    let activeDiscount = { type: 'flat', value: 0 };
+    let searchFilterQuery = '';
+
+    const DEFAULT_USERS_DB = [
+      { id: 'u1', name: "Karan", pin: "1234" }
+    ];
+    let usersDb = [...DEFAULT_USERS_DB];
+    let currentUser = { id: 'u1', name: "Karan" };
+
+    let stallSettings = {
+      name: "Karan Fataka",
+      location: "Phadke Road",
+      phone: "8879928546"
+    };
+
+    function getColRef(colName) {
+      return collection(db, 'artifacts', appId, 'public', 'data', colName);
+    }
+
+    function getDocRef(colName, docId) {
+      return doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
+    }
+
+    async function initCloudSync() {
+      firebaseConfig = getActiveFirebaseConfig();
+      if (!firebaseConfig) {
+        console.warn("Cloud config not detected, operating in offline fallback mode.");
+        setCloudStatus(false, "OFFLINE (TAP TO CONNECT)");
+        updateUserHeaderUI();
+        updateBrandUI();
+        renderAllViews();
+        return;
+      }
+
+      // Always render offline/cached state immediately so UI is never blank
+      updateUserHeaderUI();
+      updateBrandUI();
+      renderAllViews();
+
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        let signedIn = false;
+
+        // Only try custom token if NOT using custom project config
+        if (!CUSTOM_FIREBASE_CONFIG && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          try {
+            const cred = await signInWithCustomToken(auth, __initial_auth_token);
+            currentUserAuth = cred.user;
+            signedIn = true;
+          } catch (tokenErr) {
+            console.warn("Custom token sign-in skipped:", tokenErr);
+          }
+        }
+
+        // Try anonymous sign-in if not signed in yet
+        if (!signedIn) {
+          try {
+            const cred = await signInAnonymously(auth);
+            currentUserAuth = cred.user;
+            signedIn = true;
+          } catch (anonErr) {
+            console.warn("Firebase Auth note: Anonymous login not enabled yet in Firebase Console.", anonErr.message);
+          }
+        }
+
+        if (signedIn) {
+          setCloudStatus(true, "CLOUD LIVE");
+        } else {
+          setCloudStatus(false, "OFFLINE (AUTH PENDING)");
+        }
+
+        // Attempt realtime subscriptions (or fallback if rules allow unauthenticated)
+        setupRealtimeSubscriptions();
+      } catch (err) {
+        console.warn("Cloud initialization warning, operating locally:", err.message);
+        setCloudStatus(false, "OFFLINE MODE");
+      }
+    }
+
+    function setCloudStatus(online, label) {
+      const dot = document.getElementById('cloudStatusDot');
+      const badge = document.getElementById('cloudStatusBadge');
+      if (dot) {
+        dot.className = online 
+          ? 'inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' 
+          : 'inline-block w-1.5 h-1.5 rounded-full bg-amber-500';
+      }
+      if (badge) {
+        badge.innerText = online ? "CLOUD LIVE" : label;
+        badge.className = online 
+          ? 'text-[8px] px-1 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 font-bold font-mono tracking-tight active:scale-95 transition'
+          : 'text-[8px] px-1 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold font-mono tracking-tight active:scale-95 transition';
+      }
+    }
+
+    function setupRealtimeSubscriptions() {
+      if (!currentUserAuth || !db) return;
+
+      // 1. Live Products Sync
+      onSnapshot(getColRef('products'), (snapshot) => {
+        products = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCrackerCards();
+        renderStockView();
+        updateFloatingCart();
+      }, (error) => console.error("Products subscription error:", error));
+
+      // 2. Live Invoices / Sales Sync
+      onSnapshot(getColRef('sales'), (snapshot) => {
+        sales = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        sales.sort((a, b) => new Date(b.date) - new Date(a.date));
+        renderSummaryView();
+      }, (error) => console.error("Sales subscription error:", error));
+
+      // 3. Live Expenses Sync
+      onSnapshot(getColRef('expenses'), (snapshot) => {
+        expenses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        expenses.sort((a, b) => new Date(b.time) - new Date(a.time));
+        renderExpensesView();
+        renderSummaryView();
+      }, (error) => console.error("Expenses subscription error:", error));
+
+      // 4. Live Freebies Sync
+      onSnapshot(getColRef('freebies'), (snapshot) => {
+        freebies = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        freebies.sort((a, b) => new Date(b.date) - new Date(a.date));
+        renderFreebiesView();
+        renderSummaryView();
+      }, (error) => console.error("Freebies subscription error:", error));
+
+      // 5. Live Operational Audit Logs Sync
+      onSnapshot(getColRef('auditLogs'), (snapshot) => {
+        auditLogs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        auditLogs.sort((a, b) => new Date(b.time) - new Date(a.time));
+        renderHistoryView();
+      }, (error) => console.error("AuditLogs subscription error:", error));
+
+      // 6. Live Accounts & Staff Sync
+      onSnapshot(getColRef('users'), async (snapshot) => {
+        if (snapshot.empty) {
+          // Initialize default Karan account in cloud database
+          await setDoc(getDocRef('users', 'u1'), DEFAULT_USERS_DB[0]);
+          usersDb = [...DEFAULT_USERS_DB];
+        } else {
+          usersDb = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+        updateUserHeaderUI();
+      }, (error) => console.error("Users subscription error:", error));
+
+      // 7. Live Stall Categories Sync
+      onSnapshot(getDocRef('settings', 'categories_config'), async (docSnap) => {
+        if (!docSnap.exists()) {
+          await setDoc(getDocRef('settings', 'categories_config'), { list: categories });
+        } else {
+          const data = docSnap.data();
+          if (data && Array.isArray(data.list)) {
+            categories = data.list;
+            renderCategoryPills();
+            populateProductCategorySelect();
+          }
+        }
+      }, (error) => console.error("Categories subscription error:", error));
+
+      // 8. Live Stall Branding Config Sync
+      onSnapshot(getDocRef('settings', 'stall_config'), async (docSnap) => {
+        if (!docSnap.exists()) {
+          await setDoc(getDocRef('settings', 'stall_config'), stallSettings);
+        } else {
+          stallSettings = { ...stallSettings, ...docSnap.data() };
+          updateBrandUI();
+        }
+      }, (error) => console.error("Settings subscription error:", error));
+    }
+
+    function renderAllViews() {
+      renderCategoryPills();
+      populateProductCategorySelect();
+      renderCrackerCards();
+      renderStockView();
+      renderFreebiesView();
+      renderExpensesView();
+      renderHistoryView();
+      renderSummaryView();
+      updateFloatingCart();
+    }
+
+    function updateBrandUI() {
+      const bTitle = document.getElementById('brandTitle');
+      const bLoc = document.getElementById('brandLocation');
+      const bPhone = document.getElementById('brandPhone');
+      if (bTitle) bTitle.innerText = stallSettings.name;
+      if (bLoc) bLoc.innerText = stallSettings.location;
+      if (bPhone) bPhone.innerText = stallSettings.phone;
+    }
+
+    async function logAudit(type, title, details = '') {
+      const entry = {
+        id: `log-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        time: new Date().toISOString(),
+        user: currentUser.name,
+        type: type,
+        title: title,
+        details: details
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('auditLogs', entry.id), entry);
+        } catch(e) {
+          console.error("Log audit sync error:", e);
+        }
+      } else {
+        auditLogs.unshift(entry);
+        renderHistoryView();
+      }
+    }
+
+    async function clearHistoryLogs() {
+      if (db && currentUserAuth) {
+        try {
+          const snapshot = await getDocs(getColRef('auditLogs'));
+          const deletes = snapshot.docs.map(d => deleteDoc(d.ref));
+          await Promise.all(deletes);
+        } catch(e) {
+          console.error("Error clearing logs:", e);
+        }
+      } else {
+        auditLogs = [];
+        renderHistoryView();
+      }
+      triggerToast('Audit logs cleared');
+    }
+
+    function updateUserHeaderUI() {
+      const nameEl = document.getElementById('headerUserName');
+      const avatarEl = document.getElementById('userAvatarBadge');
+      if (nameEl) nameEl.innerText = currentUser.name;
+      if (avatarEl) avatarEl.innerText = currentUser.name.charAt(0).toUpperCase();
+
+      const modalInit = document.getElementById('modalActiveInitial');
+      const modalName = document.getElementById('modalActiveName');
+      if (modalInit) modalInit.innerText = currentUser.name.charAt(0).toUpperCase();
+      if (modalName) modalName.innerText = currentUser.name;
+    }
+
+    function openUserModal() {
+      updateUserHeaderUI();
+      const select = document.getElementById('loginUserSelect');
+      select.innerHTML = usersDb.map(u => `
+        <option value="${u.name}" ${u.name === currentUser.name ? 'selected' : ''}>
+          ${u.name}
+        </option>
+      `).join('');
+
+      document.getElementById('loginPinInput').value = '';
+      document.getElementById('userModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.add('hidden');
+      document.getElementById('loginPinInput').value = '';
+      document.getElementById('ownerStaffPanel').classList.add('hidden');
+    }
+
+    function handleLoginUserChange() {
+      document.getElementById('loginPinInput').value = '';
+      document.getElementById('loginPinInput').focus();
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('loginPinInput');
+      const icon = document.getElementById('loginEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function handleLoginSubmit() {
+      const selectedName = document.getElementById('loginUserSelect').value;
+      const enteredPin = document.getElementById('loginPinInput').value.trim();
+
+      const targetUser = usersDb.find(u => u.name === selectedName);
+      if (!targetUser) {
+        triggerToast('User not found');
+        return;
+      }
+
+      if (!enteredPin) {
+        triggerToast('⚠️ Please enter the password / PIN');
+        document.getElementById('loginPinInput').focus();
+        return;
+      }
+
+      if (targetUser.pin !== enteredPin) {
+        triggerToast('❌ Incorrect PIN/Password. Access denied.');
+        document.getElementById('loginPinInput').value = '';
+        document.getElementById('loginPinInput').focus();
+        return;
+      }
+
+      currentUser = { id: targetUser.id, name: targetUser.name };
+      updateUserHeaderUI();
+      closeUserModal();
+      logAudit('system', `User Logged In`, `${targetUser.name} authenticated on device`);
+      triggerToast(`Operating as ${targetUser.name}`);
+    }
+
+    function toggleOwnerStaffPanel() {
+      const panel = document.getElementById('ownerStaffPanel');
+      panel.classList.toggle('hidden');
+    }
+
+    async function addNewStaffMember() {
+      const name = document.getElementById('newStaffName').value.trim();
+      const pin = document.getElementById('newStaffPin').value.trim();
+
+      if (!name || !pin) {
+        triggerToast('Please provide both Name and PIN');
+        return;
+      }
+
+      if (usersDb.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+        triggerToast('A person with this name already exists');
+        return;
+      }
+
+      const newId = `u-${Date.now()}`;
+      const newStaff = { id: newId, name, pin };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('users', newId), newStaff);
+        } catch(e) {
+          console.error("Error saving user:", e);
+        }
+      } else {
+        usersDb.push(newStaff);
+      }
+
+      await logAudit('system', `User Account Created`, `${currentUser.name} registered ${name}`);
+      document.getElementById('newStaffName').value = '';
+      document.getElementById('newStaffPin').value = '';
+      openUserModal();
+      triggerToast(`Account for ${name} added!`);
+    }
+
+    function promptAddNewCategory() {
+      document.getElementById('customCatInput').value = '';
+      document.getElementById('newCategoryModal').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('newCategoryModal').classList.add('hidden');
+    }
+
+    async function saveNewCategory() {
+      const raw = document.getElementById('customCatInput').value.trim();
+      if (!raw) {
+        triggerToast('Please enter category name');
+        return;
+      }
+
+      const catName = raw.charAt(0).toUpperCase() + raw.slice(1);
+      if (categories.some(c => c.toLowerCase() === catName.toLowerCase())) {
+        triggerToast('Category already exists');
+        return;
+      }
+
+      categories.push(catName);
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('settings', 'categories_config'), { list: categories });
+        } catch(e) {
+          console.error("Error saving category:", e);
+        }
+      }
+
+      await logAudit('system', `Category Added: ${catName}`, `Created by ${currentUser.name}`);
+      renderCategoryPills();
+      populateProductCategorySelect();
+      closeCategoryModal();
+
+      const prodCatSelect = document.getElementById('entryProdCat');
+      if (prodCatSelect) prodCatSelect.value = catName;
+      triggerToast(`Category "${catName}" added!`);
+    }
+
+    function populateProductCategorySelect() {
+      const select = document.getElementById('entryProdCat');
+      if (!select) return;
+      select.innerHTML = categories.map(cat => `
+        <option value="${cat}">${cat}</option>
+      `).join('');
+    }
+
+    function renderCategoryPills() {
+      const container = document.getElementById('categoryPillContainer');
+      if (!container) return;
+
+      const allCats = ['All', ...categories];
+      container.innerHTML = allCats.map(cat => {
+        const isActive = (currentCategory === cat);
+        const activeStyles = 'bg-amber-500 text-neutral-950 shadow-md shadow-amber-500/20 font-black';
+        const inactiveStyles = 'bg-neutral-900 text-neutral-400 border border-neutral-800 font-semibold hover:border-neutral-700';
+
+        return `
+          <button 
+            type="button"
+            onclick="selectCategory('${cat}')" 
+            class="px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap transition active:scale-95 flex-shrink-0 ${isActive ? activeStyles : inactiveStyles}">
+            ${cat === 'All' ? '✨ All Items' : cat}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      renderCategoryPills();
+      renderCrackerCards();
+    }
+
+    function handleSearch(val) {
+      searchFilterQuery = (val || '').toLowerCase().trim();
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) {
+        if (searchFilterQuery.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      renderCrackerCards();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('productSearchInput');
+      if (input) input.value = '';
+      searchFilterQuery = '';
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderCrackerCards();
+    }
+
+    function renderCrackerCards() {
+      const grid = document.getElementById('crackersGrid');
+      const emptyState = document.getElementById('noProductsFound');
+      if (!grid) return;
+
+      let filtered = products;
+
+      if (currentCategory !== 'All') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+
+      if (searchFilterQuery) {
+        filtered = filtered.filter(p => 
+          p.name.toLowerCase().includes(searchFilterQuery) ||
+          (p.category && p.category.toLowerCase().includes(searchFilterQuery))
+        );
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(p => {
+        const isOutOfStock = p.stock <= 0;
+        const isLowStock = p.stock > 0 && p.stock <= 10;
+        const profitMargin = Math.max(0, p.selling - p.purchase);
+        const inCartItem = cart.find(c => c.id === p.id);
+        const inCartQty = inCartItem ? inCartItem.qty : 0;
+
+        return `
+          <div class="bg-neutral-900/90 border border-neutral-800 hover:border-amber-500/40 rounded-2xl p-2.5 flex flex-col justify-between transition group relative">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="text-[9px] uppercase font-bold text-neutral-400 bg-neutral-950 px-1.5 py-0.5 rounded-md border border-neutral-800">
+                  ${p.category || 'General'}
+                </span>
+                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+                  isOutOfStock ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                  isLowStock ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                  'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                }">
+                  ${isOutOfStock ? 'Out' : p.stock + ' left'}
+                </span>
+              </div>
+
+              <h4 class="font-bold text-xs text-white leading-tight line-clamp-2 min-h-[30px]">${p.name}</h4>
+              <div class="flex items-center gap-1.5 mt-1 text-[10px] text-neutral-400">
+                <span class="text-neutral-500 font-mono">Wholesale: ₹${p.purchase}</span>
+                <span class="text-emerald-400 font-mono font-semibold">+₹${profitMargin}</span>
+              </div>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-neutral-800/80 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-mono font-black text-amber-400">₹${p.selling}</span>
+                <span class="text-[9px] text-neutral-500 block">/box</span>
+              </div>
+
+              ${inCartQty > 0 ? `
+                <div class="flex items-center gap-1 bg-amber-500 rounded-xl p-0.5 shadow-sm">
+                  <button onclick="changeCartQty('${p.id}', -1)" class="w-6 h-6 rounded-lg bg-neutral-950/20 hover:bg-neutral-950/40 flex items-center justify-center text-neutral-950 font-black text-xs active:scale-90 transition">-</button>
+                  <span class="font-mono font-black text-neutral-950 text-xs px-1">${inCartQty}</span>
+                  <button onclick="changeCartQty('${p.id}', 1)" class="w-6 h-6 rounded-lg bg-neutral-950/20 hover:bg-neutral-950/40 flex items-center justify-center text-neutral-950 font-black text-xs active:scale-90 transition">+</button>
+                </div>
+              ` : `
+                <button 
+                  onclick="addToCart('${p.id}')" 
+                  ${isOutOfStock ? 'disabled' : ''}
+                  class="px-3 py-1.5 rounded-xl font-black text-xs transition flex items-center gap-1 active:scale-95 ${
+                    isOutOfStock 
+                      ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' 
+                      : 'bg-amber-500 hover:bg-amber-400 text-neutral-950 shadow-md shadow-amber-500/20'
+                  }">
+                  <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+                  <span>ADD</span>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function addToCart(prodId) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+      if (prod.stock <= 0) {
+        triggerToast('Item is out of stock!');
+        return;
+      }
+
+      const existing = cart.find(c => c.id === prod.id);
+      if (existing) {
+        if (existing.qty >= prod.stock) {
+          triggerToast(`Only ${prod.stock} boxes available in stock`);
+          return;
+        }
+        existing.qty += 1;
+      } else {
+        cart.push({
+          id: prod.id,
+          name: prod.name,
+          category: prod.category || 'General',
+          purchase: prod.purchase,
+          selling: prod.selling,
+          qty: 1
+        });
+      }
+
+      updateFloatingCart();
+      renderCrackerCards();
+      triggerToast(`Added ${prod.name}`);
+    }
+
+    function changeCartQty(prodId, delta) {
+      const itemIdx = cart.findIndex(c => c.id === prodId);
+      if (itemIdx === -1) return;
+
+      const prod = products.find(p => p.id === prodId);
+      const newQty = cart[itemIdx].qty + delta;
+
+      if (newQty <= 0) {
+        cart.splice(itemIdx, 1);
+      } else {
+        if (prod && newQty > prod.stock) {
+          triggerToast(`Maximum ${prod.stock} boxes in stock`);
+          return;
+        }
+        cart[itemIdx].qty = newQty;
+      }
+
+      updateFloatingCart();
+      renderCrackerCards();
+      renderCartDrawerItems();
+      calcCheckoutTotals();
+    }
+
+    function removeFromCart(prodId) {
+      cart = cart.filter(c => c.id !== prodId);
+      updateFloatingCart();
+      renderCrackerCards();
+      renderCartDrawerItems();
+      calcCheckoutTotals();
+    }
+
+    function clearCurrentCart() {
+      cart = [];
+      resetDiscount();
+      updateFloatingCart();
+      renderCrackerCards();
+      renderCartDrawerItems();
+      calcCheckoutTotals();
+      triggerToast('Cart cleared');
+    }
+
+    function updateFloatingCart() {
+      const bar = document.getElementById('floatingCartBar');
+      const countEl = document.getElementById('floatingCartCount');
+      const subEl = document.getElementById('floatingCartItemsSub');
+      const totalEl = document.getElementById('floatingCartTotal');
+
+      if (!bar) return;
+
+      const totalBoxes = cart.reduce((sum, item) => sum + item.qty, 0);
+      const grossTotal = cart.reduce((sum, item) => sum + (item.selling * item.qty), 0);
+
+      if (activeNav === 'billing' && totalBoxes > 0) {
+        bar.classList.remove('hidden');
+        if (countEl) countEl.innerText = totalBoxes;
+        if (subEl) subEl.innerText = `${cart.length} cracker types selected`;
+        if (totalEl) totalEl.innerText = `₹${grossTotal}`;
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    function openCheckoutSheet() {
+      if (cart.length === 0) {
+        triggerToast('Please add items to cart first');
+        return;
+      }
+
+      renderCartDrawerItems();
+      calcCheckoutTotals();
+      setPayMode('cash');
+
+      const backdrop = document.getElementById('checkoutBackdrop');
+      const drawer = document.getElementById('checkoutDrawer');
+      if (backdrop && drawer) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-y-full'), 10);
+      }
+      lucide.createIcons();
+    }
+
+    function closeCheckoutSheet() {
+      const backdrop = document.getElementById('checkoutBackdrop');
+      const drawer = document.getElementById('checkoutDrawer');
+      if (drawer) drawer.classList.add('translate-y-full');
+      setTimeout(() => {
+        if (backdrop) backdrop.classList.add('hidden');
+      }, 250);
+    }
+
+    function renderCartDrawerItems() {
+      const container = document.getElementById('cartItemsList');
+      if (!container) return;
+
+      if (cart.length === 0) {
+        container.innerHTML = `<p class="text-neutral-500 py-3 text-center">Your cart is empty.</p>`;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <span class="font-bold text-white block truncate text-xs">${item.name}</span>
+            <span class="text-[10px] text-neutral-400 font-mono">₹${item.selling} &times; ${item.qty} = ₹${item.selling * item.qty}</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <div class="flex items-center gap-1 bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
+              <button onclick="changeCartQty('${item.id}', -1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center active:scale-90">-</button>
+              <span class="w-6 text-center font-mono font-bold text-white text-xs">${item.qty}</span>
+              <button onclick="changeCartQty('${item.id}', 1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center active:scale-90">+</button>
+            </div>
+            <button onclick="removeFromCart('${item.id}')" class="p-1 text-neutral-500 hover:text-red-400 transition">
+              <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function applyDiscountPreset(val, type) {
+      activeDiscount = { type: type, value: val };
+      const customInput = document.getElementById('customDiscountVal');
+      if (customInput) customInput.value = '';
+      calcCheckoutTotals();
+    }
+
+    function handleCustomDiscount(val) {
+      const parsed = parseFloat(val) || 0;
+      activeDiscount = { type: 'flat', value: Math.max(0, parsed) };
+      calcCheckoutTotals();
+    }
+
+    function resetDiscount() {
+      activeDiscount = { type: 'flat', value: 0 };
+      const customInput = document.getElementById('customDiscountVal');
+      if (customInput) customInput.value = '';
+      calcCheckoutTotals();
+    }
+
+    function calcCheckoutTotals() {
+      const grossSubtotal = cart.reduce((sum, item) => sum + (item.selling * item.qty), 0);
+      let discountAmount = 0;
+
+      if (activeDiscount.type === 'pct') {
+        discountAmount = Math.round((grossSubtotal * activeDiscount.value) / 100);
+      } else {
+        discountAmount = activeDiscount.value;
+      }
+
+      discountAmount = Math.min(discountAmount, grossSubtotal);
+      const grandTotal = Math.max(0, grossSubtotal - discountAmount);
+
+      const grossEl = document.getElementById('checkoutGrossSubtotal');
+      const grandEl = document.getElementById('checkoutGrandTotal');
+      const discountLabel = document.getElementById('cartDiscountLabel');
+
+      if (grossEl) grossEl.innerText = `₹${grossSubtotal}`;
+      if (grandEl) grandEl.innerText = `₹${grandTotal}`;
+      if (discountLabel) {
+        discountLabel.innerText = discountAmount > 0 
+          ? `-₹${discountAmount} off (${activeDiscount.type === 'pct' ? activeDiscount.value + '%' : 'Flat'})`
+          : '₹0 off';
+      }
+
+      calcChangeReturn(document.getElementById('cashGivenInput')?.value || 0);
+      return { grossSubtotal, discountAmount, grandTotal };
+    }
+
+    function setPayMode(mode) {
+      checkoutPayMode = mode;
+      const btnCash = document.getElementById('payBtnCash');
+      const btnUpi = document.getElementById('payBtnUpi');
+      const btnSplit = document.getElementById('payBtnSplit');
+      const cashBox = document.getElementById('cashTenderBox');
+
+      const activeClasses = 'py-2.5 rounded-xl border border-amber-500 bg-amber-500/20 text-amber-300 font-black text-xs flex flex-col items-center justify-center gap-1 active:scale-95';
+      const inactiveClasses = 'py-2.5 rounded-xl border border-neutral-800 bg-neutral-950 text-neutral-400 font-bold text-xs flex flex-col items-center justify-center gap-1 active:scale-95';
+
+      if (btnCash) btnCash.className = (mode === 'cash') ? activeClasses : inactiveClasses;
+      if (btnUpi) btnUpi.className = (mode === 'upi') ? activeClasses : inactiveClasses;
+      if (btnSplit) btnSplit.className = (mode === 'split') ? activeClasses : inactiveClasses;
+
+      if (cashBox) {
+        if (mode === 'cash' || mode === 'split') cashBox.classList.remove('hidden');
+        else cashBox.classList.add('hidden');
+      }
+    }
+
+    function setTenderExact() {
+      const { grandTotal } = calcCheckoutTotals();
+      const input = document.getElementById('cashGivenInput');
+      if (input) {
+        input.value = grandTotal;
+        calcChangeReturn(grandTotal);
+      }
+    }
+
+    function setTenderAmount(amt) {
+      const input = document.getElementById('cashGivenInput');
+      if (input) {
+        input.value = amt;
+        calcChangeReturn(amt);
+      }
+    }
+
+    function calcChangeReturn(val) {
+      const cashGiven = parseFloat(val) || 0;
+      const { grandTotal } = calcCheckoutTotals();
+      const change = cashGiven - grandTotal;
+      const label = document.getElementById('changeReturnLabel');
+
+      if (label) {
+        if (change >= 0) {
+          label.className = 'text-[11px] font-mono text-emerald-400 font-black';
+          label.innerText = `Change: ₹${change}`;
+        } else {
+          label.className = 'text-[11px] font-mono text-amber-400 font-black';
+          label.innerText = `Pending: ₹${Math.abs(change)}`;
+        }
+      }
+    }
+
+    async function processOrderCheckout() {
+      if (cart.length === 0) {
+        triggerToast('No items in cart');
+        return;
+      }
+
+      // Check stock availability
+      for (const item of cart) {
+        const prod = products.find(p => p.id === item.id);
+        if (!prod || prod.stock < item.qty) {
+          triggerToast(`Stock shortage for ${item.name}`);
+          return;
+        }
+      }
+
+      const { grossSubtotal, discountAmount, grandTotal } = calcCheckoutTotals();
+      const custName = document.getElementById('custNameInput')?.value.trim() || 'Walk-in Customer';
+      const custPhone = document.getElementById('custPhoneInput')?.value.trim() || '';
+
+      const totalWholesaleCost = cart.reduce((sum, item) => sum + (item.purchase * item.qty), 0);
+      const grossProfit = Math.max(0, grandTotal - totalWholesaleCost);
+
+      const invoiceNum = `KF-${Math.floor(1000 + Math.random() * 9000)}`;
+      const invoice = {
+        id: invoiceNum,
+        date: new Date().toISOString(),
+        customer: { name: custName, phone: custPhone },
+        items: [...cart],
+        subtotal: grossSubtotal,
+        discount: discountAmount,
+        total: grandTotal,
+        cost: totalWholesaleCost,
+        profit: grossProfit,
+        payMode: checkoutPayMode,
+        createdBy: currentUser.name
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          // 1. Save new invoice to cloud database
+          await setDoc(getDocRef('sales', invoice.id), invoice);
+
+          // 2. Synchronize stock deductions
+          for (const item of cart) {
+            const p = products.find(prod => prod.id === item.id);
+            if (p) {
+              const updatedStock = Math.max(0, p.stock - item.qty);
+              await updateDoc(getDocRef('products', item.id), { stock: updatedStock });
+            }
+          }
+        } catch (e) {
+          console.error("Order checkout error:", e);
+        }
+      } else {
+        cart.forEach(item => {
+          const prod = products.find(p => p.id === item.id);
+          if (prod) prod.stock = Math.max(0, prod.stock - item.qty);
+        });
+        sales.unshift(invoice);
+        renderStockView();
+        renderCrackerCards();
+        renderSummaryView();
+      }
+
+      await logAudit(
+        'bill', 
+        `Bill #${invoiceNum} (${invoice.customer.name})`, 
+        `Total: ₹${grandTotal} (${checkoutPayMode.toUpperCase()}), ${cart.reduce((s,i) => s + i.qty, 0)} boxes by ${currentUser.name}`
+      );
+
+      // Clean active cart and close sheet
+      cart = [];
+      resetDiscount();
+      if (document.getElementById('custNameInput')) document.getElementById('custNameInput').value = '';
+      if (document.getElementById('custPhoneInput')) document.getElementById('custPhoneInput').value = '';
+      if (document.getElementById('cashGivenInput')) document.getElementById('cashGivenInput').value = '';
+
+      closeCheckoutSheet();
+      updateFloatingCart();
+
+      // Display thermal receipt
+      currentReceiptInvoice = invoice;
+      renderThermalReceipt(invoice);
+      const receiptModal = document.getElementById('receiptModal');
+      if (receiptModal) receiptModal.classList.remove('hidden');
+
+      triggerToast(`Bill #${invoiceNum} generated!`);
+    }
+
+    function renderThermalReceipt(inv) {
+      if (!inv) return;
+
+      document.getElementById('rcptStallName').innerText = stallSettings.name.toUpperCase();
+      document.getElementById('rcptStallLoc').innerText = stallSettings.location;
+      document.getElementById('rcptStallPhone').innerText = stallSettings.phone;
+      document.getElementById('rcptInvoiceId').innerText = `#${inv.id}`;
+
+      const dateObj = new Date(inv.date);
+      const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      document.getElementById('rcptDate').innerText = `${dateStr} ${timeStr}`;
+
+      document.getElementById('rcptCustName').innerText = inv.customer.name;
+      document.getElementById('rcptPayMode').innerText = inv.payMode.toUpperCase();
+      document.getElementById('rcptOperator').innerText = inv.createdBy || 'Staff';
+
+      const tbody = document.getElementById('rcptItemsTbody');
+      tbody.innerHTML = inv.items.map(item => `
+        <tr class="border-b border-dashed border-neutral-200">
+          <td class="py-1 max-w-[120px] truncate">${item.name}</td>
+          <td class="text-center font-bold">${item.qty}</td>
+          <td class="text-right">₹${item.selling}</td>
+          <td class="text-right font-bold">₹${item.selling * item.qty}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('rcptSubtotal').innerText = `₹${inv.subtotal}`;
+      const discRow = document.getElementById('rcptDiscountRow');
+      if (inv.discount > 0) {
+        if (discRow) discRow.classList.remove('hidden');
+        document.getElementById('rcptDiscount').innerText = `-₹${inv.discount}`;
+      } else {
+        if (discRow) discRow.classList.add('hidden');
+      }
+      document.getElementById('rcptGrandTotal').innerText = `₹${inv.total}`;
+    }
+
+    function closeReceiptModal() {
+      const modal = document.getElementById('receiptModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function sendWhatsAppReceipt() {
+      if (!currentReceiptInvoice) return;
+      const inv = currentReceiptInvoice;
+
+      const itemsText = inv.items.map(i => `• ${i.name} x ${i.qty} = ₹${i.selling * i.qty}`).join('\n');
+      const discountLine = inv.discount > 0 ? `*Festival Discount:* -₹${inv.discount}\n` : '';
+
+      const message = `🪔 *${stallSettings.name.toUpperCase()}* 🪔\n` +
+        `📍 ${stallSettings.location} | 📞 ${stallSettings.phone}\n` +
+        `--------------------------------\n` +
+        `*Bill No:* #${inv.id}\n` +
+        `*Customer:* ${inv.customer.name}\n` +
+        `*Payment:* ${inv.payMode.toUpperCase()}\n` +
+        `--------------------------------\n` +
+        itemsText + `\n` +
+        `--------------------------------\n` +
+        `*Subtotal:* ₹${inv.subtotal}\n` +
+        discountLine +
+        `*FINAL AMOUNT:* ₹${inv.total}\n` +
+        `--------------------------------\n` +
+        `✨ Wishing you a safe & prosperous Diwali! ✨`;
+
+      const encoded = encodeURIComponent(message);
+      let targetPhone = inv.customer.phone ? inv.customer.phone.replace(/[^0-9]/g, '') : '';
+      if (targetPhone.length === 10) targetPhone = '91' + targetPhone;
+
+      if (targetPhone) {
+        window.open(`https://api.whatsapp.com/send?phone=${targetPhone}&text=${encoded}`, '_blank');
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+      }
+    }
+
+    function filterStockStatus(status) {
+      currentStockStatus = status;
+      const btnAll = document.getElementById('stockFilterAll');
+      const btnLow = document.getElementById('stockFilterLow');
+
+      if (status === 'all') {
+        if (btnAll) btnAll.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 shadow';
+        if (btnLow) btnLow.className = 'px-3 py-1 rounded-xl text-xs font-semibold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1';
+      } else {
+        if (btnAll) btnAll.className = 'px-3 py-1 rounded-xl text-xs font-semibold bg-neutral-900 text-neutral-400 border border-neutral-800';
+        if (btnLow) btnLow.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 shadow flex items-center gap-1';
+      }
+      renderStockView();
+    }
+
+    function renderStockView() {
+      const container = document.getElementById('stockItemsContainer');
+      const overviewText = document.getElementById('stockOverviewText');
+      const lowStockDot = document.getElementById('navLowStockDot');
+
+      if (overviewText) overviewText.innerText = `${products.length} items in stall catalogue`;
+
+      const lowStockCount = products.filter(p => p.stock <= 10).length;
+      if (lowStockDot) {
+        if (lowStockCount > 0) lowStockDot.classList.remove('hidden');
+        else lowStockDot.classList.add('hidden');
+      }
+
+      if (!container) return;
+
+      let filtered = products;
+      if (currentStockStatus === 'low') {
+        filtered = filtered.filter(p => p.stock <= 10);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-neutral-500 text-xs bg-neutral-900/40 border border-dashed border-neutral-800 rounded-3xl">
+            <i data-lucide="package-open" class="w-8 h-8 text-neutral-600 mx-auto mb-2"></i>
+            <p class="font-bold text-neutral-400">No items in stock view</p>
+            <p class="text-[11px] text-neutral-500 mt-0.5">Tap '+ Add Cracker' above to add stock and wholesale purchase rates.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => {
+        const isLow = p.stock <= 10;
+        const profitMargin = Math.max(0, p.selling - p.purchase);
+
+        return `
+          <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-3 flex items-center justify-between gap-2.5 text-xs shadow-sm">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="font-bold text-white truncate text-xs">${p.name}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-neutral-950 border border-neutral-800 text-neutral-400">${p.category || 'General'}</span>
+              </div>
+              <div class="flex items-center gap-2 text-[10px] text-neutral-400">
+                <span>Cost: <strong class="text-neutral-300 font-mono">₹${p.purchase}</strong></span>
+                <span>Sell: <strong class="text-amber-400 font-mono">₹${p.selling}</strong></span>
+                <span class="text-emerald-400 font-mono font-semibold">+₹${profitMargin}/box</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <div class="flex items-center gap-1 bg-neutral-950 p-1 rounded-xl border border-neutral-800">
+                <button onclick="adjustStockInline('${p.id}', -1)" class="w-6 h-6 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 flex items-center justify-center font-bold active:scale-90">-1</button>
+                <span class="w-8 text-center font-mono font-black ${isLow ? 'text-red-400' : 'text-white'} text-xs">${p.stock}</span>
+                <button onclick="adjustStockInline('${p.id}', 1)" class="w-6 h-6 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 flex items-center justify-center font-bold active:scale-90">+1</button>
+                <button onclick="adjustStockInline('${p.id}', 10)" class="px-1.5 h-6 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-[10px] active:scale-90">+10</button>
+              </div>
+
+              <button onclick="deleteProduct('${p.id}')" title="Delete product" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-red-400 transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function adjustStockInline(prodId, delta) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const prev = prod.stock;
+      const newStock = Math.max(0, prod.stock + delta);
+
+      if (db && currentUserAuth) {
+        try {
+          await updateDoc(getDocRef('products', prodId), { stock: newStock });
+        } catch(e) {
+          console.error("Error updating stock:", e);
+        }
+      } else {
+        prod.stock = newStock;
+        renderStockView();
+        renderCrackerCards();
+      }
+
+      await logAudit('stock', `Stock Adjusted: ${prod.name}`, `${delta > 0 ? '+' : ''}${delta} boxes (Was: ${prev}, Now: ${newStock}) by ${currentUser.name}`);
+      triggerToast(`${prod.name}: ${newStock} boxes`);
+    }
+
+    async function deleteProduct(prodId) {
+      const idx = products.findIndex(p => p.id === prodId);
+      if (idx === -1) return;
+      const name = products[idx].name;
+
+      if (db && currentUserAuth) {
+        try {
+          await deleteDoc(getDocRef('products', prodId));
+        } catch(e) {
+          console.error("Error deleting product:", e);
+        }
+      } else {
+        products.splice(idx, 1);
+        renderStockView();
+        renderCrackerCards();
+      }
+
+      await logAudit('stock', `Cracker Removed: ${name}`, `Deleted by ${currentUser.name}`);
+      triggerToast(`Removed ${name}`);
+    }
+
+    function openProductSheet(prodId = null) {
+      populateProductCategorySelect();
+      const form = document.getElementById('productEntryForm');
+      if (form) form.reset();
+
+      document.getElementById('entryProdId').value = '';
+      document.getElementById('productSheetTitle').innerText = 'Add New Firecracker';
+      document.getElementById('entryProdStock').value = '20';
+
+      const backdrop = document.getElementById('productSheetBackdrop');
+      const drawer = document.getElementById('productSheetDrawer');
+      if (backdrop && drawer) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-y-full'), 10);
+      }
+    }
+
+    function closeProductSheet() {
+      const backdrop = document.getElementById('productSheetBackdrop');
+      const drawer = document.getElementById('productSheetDrawer');
+      if (drawer) drawer.classList.add('translate-y-full');
+      setTimeout(() => {
+        if (backdrop) backdrop.classList.add('hidden');
+      }, 250);
+    }
+
+    async function handleProductSave(e) {
+      e.preventDefault();
+      const name = document.getElementById('entryProdName').value.trim();
+      const cat = document.getElementById('entryProdCat').value;
+      const stock = parseInt(document.getElementById('entryProdStock').value) || 0;
+      const cost = parseFloat(document.getElementById('entryProdCost').value) || 0;
+      const sell = parseFloat(document.getElementById('entryProdSell').value) || 0;
+
+      if (!name) {
+        triggerToast('Please enter cracker name');
+        return;
+      }
+
+      const newProd = {
+        id: `prod-${Date.now()}`,
+        name: name,
+        category: cat,
+        stock: stock,
+        purchase: cost,
+        selling: sell
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('products', newProd.id), newProd);
+        } catch(e) {
+          console.error("Error saving new cracker:", e);
+        }
+      } else {
+        products.unshift(newProd);
+        renderStockView();
+        renderCrackerCards();
+      }
+
+      await logAudit('stock', `New Cracker Added: ${name}`, `Stock: ${stock}, Wholesale: ₹${cost}, Sell: ₹${sell} by ${currentUser.name}`);
+      closeProductSheet();
+      triggerToast(`Added ${name} to catalogue!`);
+    }
+
+    function openEditBillDrawer(invoiceId) {
+      const inv = sales.find(s => s.id === invoiceId);
+      if (!inv) return;
+
+      activeEditInvoice = JSON.parse(JSON.stringify(inv));
+
+      document.getElementById('editBillTitle').innerText = `Edit Bill #${activeEditInvoice.id}`;
+      document.getElementById('editBillOperatorSub').innerText = `Originally created by ${activeEditInvoice.createdBy || 'Staff'}`;
+      document.getElementById('editBillCustName').value = activeEditInvoice.customer.name;
+      document.getElementById('editBillCustPhone').value = activeEditInvoice.customer.phone || '';
+      document.getElementById('editBillDiscount').value = activeEditInvoice.discount || 0;
+      document.getElementById('editBillPayMode').value = activeEditInvoice.payMode || 'cash';
+      document.getElementById('editBillReason').value = '';
+
+      const prodSelect = document.getElementById('editBillProductSelect');
+      if (prodSelect) {
+        prodSelect.innerHTML = products.map(p => `
+          <option value="${p.id}">${p.name} (₹${p.selling})</option>
+        `).join('');
+      }
+
+      renderEditBillItemsList();
+      calcEditBillTotals();
+
+      const backdrop = document.getElementById('editBillBackdrop');
+      const drawer = document.getElementById('editBillDrawer');
+      if (backdrop && drawer) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-y-full'), 10);
+      }
+      lucide.createIcons();
+    }
+
+    function closeEditBillDrawer() {
+      const backdrop = document.getElementById('editBillBackdrop');
+      const drawer = document.getElementById('editBillDrawer');
+      if (drawer) drawer.classList.add('translate-y-full');
+      setTimeout(() => {
+        if (backdrop) backdrop.classList.add('hidden');
+        activeEditInvoice = null;
+      }, 250);
+    }
+
+    function renderEditBillItemsList() {
+      const container = document.getElementById('editBillItemsList');
+      if (!container || !activeEditInvoice) return;
+
+      container.innerHTML = activeEditInvoice.items.map((item, idx) => `
+        <div class="flex items-center justify-between py-2 text-xs">
+          <div class="min-w-0 flex-1 pr-2">
+            <span class="font-bold text-white block truncate">${item.name}</span>
+            <span class="text-[10px] text-neutral-400 font-mono">₹${item.selling} &times; ${item.qty} = ₹${item.selling * item.qty}</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <div class="flex items-center gap-1 bg-neutral-950 p-1 rounded-lg border border-neutral-800">
+              <button onclick="changeEditBillItemQty(${idx}, -1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center">-</button>
+              <span class="w-6 text-center font-mono font-bold text-white">${item.qty}</span>
+              <button onclick="changeEditBillItemQty(${idx}, 1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center">+</button>
+            </div>
+            <button onclick="removeEditBillItem(${idx})" class="p-1 text-neutral-500 hover:text-red-400">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function changeEditBillItemQty(idx, delta) {
+      if (!activeEditInvoice) return;
+      activeEditInvoice.items[idx].qty += delta;
+      if (activeEditInvoice.items[idx].qty <= 0) {
+        activeEditInvoice.items.splice(idx, 1);
+      }
+      renderEditBillItemsList();
+      calcEditBillTotals();
+    }
+
+    function removeEditBillItem(idx) {
+      if (!activeEditInvoice) return;
+      activeEditInvoice.items.splice(idx, 1);
+      renderEditBillItemsList();
+      calcEditBillTotals();
+    }
+
+    function addItemToActiveEditBill() {
+      if (!activeEditInvoice) return;
+      const select = document.getElementById('editBillProductSelect');
+      const prodId = select?.value;
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const existing = activeEditInvoice.items.find(i => i.id === prod.id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        activeEditInvoice.items.push({
+          id: prod.id,
+          name: prod.name,
+          category: prod.category || 'General',
+          purchase: prod.purchase,
+          selling: prod.selling,
+          qty: 1
+        });
+      }
+
+      renderEditBillItemsList();
+      calcEditBillTotals();
+      triggerToast(`Added ${prod.name}`);
+    }
+
+    function calcEditBillTotals() {
+      if (!activeEditInvoice) return;
+      const subtotal = activeEditInvoice.items.reduce((sum, item) => sum + (item.selling * item.qty), 0);
+      const discount = parseFloat(document.getElementById('editBillDiscount')?.value) || 0;
+      const grandTotal = Math.max(0, subtotal - discount);
+
+      const totalEl = document.getElementById('editBillGrandTotal');
+      if (totalEl) totalEl.innerText = `₹${grandTotal}`;
+
+      return { subtotal, discount, grandTotal };
+    }
+
+    async function saveActiveEditedBill() {
+      if (!activeEditInvoice) return;
+
+      const reason = document.getElementById('editBillReason')?.value.trim();
+      if (!reason || reason.length < 3) {
+        triggerToast('⚠️ Mandatory: Please provide a reason for edit!');
+        const reasonInput = document.getElementById('editBillReason');
+        if (reasonInput) {
+          reasonInput.focus();
+          reasonInput.classList.add('border-red-500');
+        }
+        return;
+      }
+
+      if (activeEditInvoice.items.length === 0) {
+        triggerToast('Bill must have at least one cracker item');
+        return;
+      }
+
+      const origIdx = sales.findIndex(s => s.id === activeEditInvoice.id);
+      if (origIdx === -1) return;
+      const origInv = sales[origIdx];
+
+      const subtotal = activeEditInvoice.items.reduce((sum, item) => sum + (item.selling * item.qty), 0);
+      const discount = parseFloat(document.getElementById('editBillDiscount')?.value) || 0;
+      const grandTotal = Math.max(0, subtotal - discount);
+      const cost = activeEditInvoice.items.reduce((sum, item) => sum + (item.purchase * item.qty), 0);
+      const profit = Math.max(0, grandTotal - cost);
+
+      const updatedBill = {
+        ...origInv,
+        customer: {
+          name: document.getElementById('editBillCustName')?.value.trim() || origInv.customer.name,
+          phone: document.getElementById('editBillCustPhone')?.value.trim() || origInv.customer.phone
+        },
+        items: [...activeEditInvoice.items],
+        subtotal: subtotal,
+        discount: discount,
+        total: grandTotal,
+        cost: cost,
+        profit: profit,
+        payMode: document.getElementById('editBillPayMode')?.value || origInv.payMode,
+        lastEditedBy: currentUser.name,
+        editReason: reason,
+        editedAt: new Date().toISOString()
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          // Restore prior stock in cloud
+          for (const oldItem of origInv.items) {
+            const p = products.find(prod => prod.id === oldItem.id);
+            if (p) {
+              await updateDoc(getDocRef('products', oldItem.id), { stock: p.stock + oldItem.qty });
+            }
+          }
+
+          // Deduct adjusted stock
+          for (const newItem of activeEditInvoice.items) {
+            const p = products.find(prod => prod.id === newItem.id);
+            if (p) {
+              const cur = p.stock;
+              await updateDoc(getDocRef('products', newItem.id), { stock: Math.max(0, cur - newItem.qty) });
+            }
+          }
+
+          // Save bill changes to cloud
+          await setDoc(getDocRef('sales', updatedBill.id), updatedBill);
+        } catch(e) {
+          console.error("Error saving edited bill to cloud:", e);
+        }
+      } else {
+        origInv.items.forEach(oldItem => {
+          const p = products.find(prod => prod.id === oldItem.id);
+          if (p) p.stock += oldItem.qty;
+        });
+        activeEditInvoice.items.forEach(newItem => {
+          const p = products.find(prod => prod.id === newItem.id);
+          if (p) p.stock = Math.max(0, p.stock - newItem.qty);
+        });
+        sales[origIdx] = updatedBill;
+        renderStockView();
+        renderCrackerCards();
+        renderSummaryView();
+      }
+
+      await logAudit(
+        'bill',
+        `Bill #${updatedBill.id} Edited by ${currentUser.name}`,
+        `Reason: "${reason}" (Old: ₹${origInv.total} ➔ New: ₹${grandTotal})`
+      );
+
+      closeEditBillDrawer();
+      triggerToast(`Bill #${updatedBill.id} updated!`);
+    }
+
+    function switchNav(nav) {
+      activeNav = nav;
+
+      const views = {
+        billing: document.getElementById('viewBilling'),
+        stock: document.getElementById('viewStock'),
+        freebies: document.getElementById('viewFreebies'),
+        expenses: document.getElementById('viewExpenses'),
+        history: document.getElementById('viewHistory'),
+        summary: document.getElementById('viewSummary')
+      };
+
+      const navBtns = {
+        billing: document.getElementById('navBilling'),
+        stock: document.getElementById('navStock'),
+        freebies: document.getElementById('navFreebies'),
+        expenses: document.getElementById('navExpenses'),
+        history: document.getElementById('navHistory'),
+        summary: document.getElementById('navSummary')
+      };
+
+      Object.keys(views).forEach(key => {
+        if (views[key]) {
+          if (key === nav) views[key].classList.remove('hidden');
+          else views[key].classList.add('hidden');
+        }
+      });
+
+      const activeClass = "flex flex-col items-center justify-center py-1 text-amber-400 font-bold active:scale-90 transition";
+      const inactiveClass = "flex flex-col items-center justify-center py-1 text-neutral-400 font-medium active:scale-90 transition";
+
+      Object.keys(navBtns).forEach(key => {
+        if (navBtns[key]) navBtns[key].className = (key === nav) ? activeClass : inactiveClass;
+      });
+
+      updateFloatingCart();
+
+      if (nav === 'stock') renderStockView();
+      if (nav === 'freebies') renderFreebiesView();
+      if (nav === 'expenses') renderExpensesView();
+      if (nav === 'history') renderHistoryView();
+      if (nav === 'summary') renderSummaryView();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function openFreebieSheet() {
+      freebieStagingItems = [];
+      document.getElementById('freebieRecipientInput').value = '';
+      document.getElementById('freebieNotesInput').value = '';
+      document.getElementById('freebieItemQtyInput').value = '1';
+
+      const select = document.getElementById('freebieProductSelect');
+      if (products.length === 0) {
+        select.innerHTML = '<option value="">No stock in stall catalogue</option>';
+      } else {
+        select.innerHTML = products.map(p => `
+          <option value="${p.id}">${p.name} (Stock: ${p.stock}, Cost: ₹${p.purchase})</option>
+        `).join('');
+      }
+
+      renderFreebieStagingList();
+
+      const backdrop = document.getElementById('freebieSheetBackdrop');
+      const drawer = document.getElementById('freebieSheetDrawer');
+      backdrop.classList.remove('hidden');
+      setTimeout(() => drawer.classList.remove('translate-y-full'), 10);
+      lucide.createIcons();
+    }
+
+    function closeFreebieSheet() {
+      const backdrop = document.getElementById('freebieSheetBackdrop');
+      const drawer = document.getElementById('freebieSheetDrawer');
+      drawer.classList.add('translate-y-full');
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+        freebieStagingItems = [];
+      }, 250);
+    }
+
+    function addCrackerToFreebieCart() {
+      const prodId = document.getElementById('freebieProductSelect').value;
+      const qty = parseInt(document.getElementById('freebieItemQtyInput').value) || 1;
+      const prod = products.find(p => p.id === prodId);
+
+      if (!prod) {
+        triggerToast('Please select a valid firecracker');
+        return;
+      }
+
+      if (prod.stock <= 0) {
+        triggerToast(`"${prod.name}" is currently out of stock`);
+        return;
+      }
+
+      const existing = freebieStagingItems.find(i => i.id === prod.id);
+      const currentRequested = existing ? existing.qty : 0;
+
+      if (currentRequested + qty > prod.stock) {
+        triggerToast(`Only ${prod.stock} boxes available in stock`);
+        return;
+      }
+
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        freebieStagingItems.push({
+          id: prod.id,
+          name: prod.name,
+          category: prod.category || 'General',
+          purchase: prod.purchase,
+          selling: prod.selling,
+          qty: qty
+        });
+      }
+
+      document.getElementById('freebieItemQtyInput').value = '1';
+      renderFreebieStagingList();
+      triggerToast(`Added ${prod.name} (${qty} box)`);
+    }
+
+    function removeFreebieStagingItem(idx) {
+      freebieStagingItems.splice(idx, 1);
+      renderFreebieStagingList();
+    }
+
+    function renderFreebieStagingList() {
+      const container = document.getElementById('freebieItemsContainer');
+      const totalCostEl = document.getElementById('freebieDrawerTotalCost');
+
+      const totalCost = freebieStagingItems.reduce((acc, i) => acc + (i.purchase * i.qty), 0);
+      if (totalCostEl) totalCostEl.innerText = `₹${totalCost}`;
+
+      if (freebieStagingItems.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-neutral-500 py-3 text-center border border-dashed border-neutral-800 rounded-xl">No crackers selected yet. Pick an item and tap Add.</p>`;
+        return;
+      }
+
+      container.innerHTML = freebieStagingItems.map((item, idx) => `
+        <div class="flex items-center justify-between gap-2 bg-neutral-950 p-2 rounded-xl border border-neutral-800 text-xs">
+          <div class="min-w-0 flex-1">
+            <span class="font-bold text-white block truncate">${item.name}</span>
+            <span class="text-[10px] text-neutral-400 font-mono">Wholesale: ₹${item.purchase} &times; ${item.qty} = ₹${item.purchase * item.qty}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-pink-400">${item.qty} box</span>
+            <button onclick="removeFreebieStagingItem(${idx})" class="p-1 text-neutral-400 hover:text-red-400">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    async function handleFreebieDispatchSave() {
+      const recipient = document.getElementById('freebieRecipientInput').value.trim();
+      const cat = document.getElementById('freebieCategorySelect').value;
+      const notes = document.getElementById('freebieNotesInput').value.trim() || '-';
+
+      if (!recipient) {
+        triggerToast('⚠️ Please enter who is receiving this freebie');
+        document.getElementById('freebieRecipientInput').focus();
+        return;
+      }
+
+      if (freebieStagingItems.length === 0) {
+        triggerToast('⚠️ Please add at least one firecracker');
+        return;
+      }
+
+      for (const item of freebieStagingItems) {
+        const p = products.find(prod => prod.id === item.id);
+        if (!p || p.stock < item.qty) {
+          triggerToast(`Insufficient stock for ${item.name}`);
+          return;
+        }
+      }
+
+      const totalCost = freebieStagingItems.reduce((acc, i) => acc + (i.purchase * i.qty), 0);
+      const totalRetail = freebieStagingItems.reduce((acc, i) => acc + (i.selling * i.qty), 0);
+      const totalBoxes = freebieStagingItems.reduce((acc, i) => acc + i.qty, 0);
+
+      const entry = {
+        id: `fb-${Date.now()}`,
+        date: new Date().toISOString(),
+        recipient: recipient,
+        category: cat,
+        notes: notes,
+        items: [...freebieStagingItems],
+        totalCost: totalCost,
+        totalRetail: totalRetail,
+        totalBoxes: totalBoxes,
+        givenBy: currentUser.name
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('freebies', entry.id), entry);
+          for (const item of freebieStagingItems) {
+            const p = products.find(prod => prod.id === item.id);
+            if (p) {
+              await updateDoc(getDocRef('products', item.id), { stock: Math.max(0, p.stock - item.qty) });
+            }
+          }
+        } catch(e) {
+          console.error("Error saving freebie:", e);
+        }
+      } else {
+        freebieStagingItems.forEach(item => {
+          const prod = products.find(p => p.id === item.id);
+          if (prod) prod.stock = Math.max(0, prod.stock - item.qty);
+        });
+        freebies.unshift(entry);
+        renderCrackerCards();
+        renderStockView();
+        renderFreebiesView();
+        renderSummaryView();
+      }
+
+      await logAudit(
+        'stock',
+        `Freebie to ${recipient} (${cat})`,
+        `${totalBoxes} boxes (Cost ₹${totalCost}, Retail ₹${totalRetail}) by ${currentUser.name}`
+      );
+
+      closeFreebieSheet();
+      triggerToast(`Freebie recorded for ${recipient}!`);
+    }
+
+    async function deleteFreebieEntry(id) {
+      const fbIdx = freebies.findIndex(x => x.id === id);
+      if (fbIdx === -1) return;
+
+      const fb = freebies[fbIdx];
+
+      if (db && currentUserAuth) {
+        try {
+          for (const item of fb.items) {
+            const p = products.find(prod => prod.id === item.id);
+            if (p) {
+              await updateDoc(getDocRef('products', item.id), { stock: p.stock + item.qty });
+            }
+          }
+          await deleteDoc(getDocRef('freebies', id));
+        } catch(e) {
+          console.error("Error deleting freebie:", e);
+        }
+      } else {
+        fb.items.forEach(item => {
+          const prod = products.find(p => p.id === item.id);
+          if (prod) prod.stock += item.qty;
+        });
+        freebies.splice(fbIdx, 1);
+        renderCrackerCards();
+        renderStockView();
+        renderFreebiesView();
+        renderSummaryView();
+      }
+
+      await logAudit('stock', `Freebie Cancelled (${fb.recipient})`, `Stock restored for ${fb.totalBoxes} boxes by ${currentUser.name}`);
+      triggerToast('Freebie deleted and stock restored');
+    }
+
+    function renderFreebiesView() {
+      const container = document.getElementById('freebiesCardList');
+      const costEl = document.getElementById('totalFreebieCost');
+      const retailEl = document.getElementById('totalFreebieRetail');
+      const boxesEl = document.getElementById('totalFreebieBoxes');
+
+      const sumCost = freebies.reduce((acc, f) => acc + f.totalCost, 0);
+      const sumRetail = freebies.reduce((acc, f) => acc + f.totalRetail, 0);
+      const sumBoxes = freebies.reduce((acc, f) => acc + f.totalBoxes, 0);
+
+      if (costEl) costEl.innerText = `₹${sumCost}`;
+      if (retailEl) retailEl.innerText = `₹${sumRetail}`;
+      if (boxesEl) boxesEl.innerText = `${sumBoxes}`;
+
+      if (freebies.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-neutral-500 text-xs bg-neutral-900/40 border border-dashed border-neutral-800 rounded-3xl">
+            <i data-lucide="gift" class="w-8 h-8 text-pink-500/40 mx-auto mb-2"></i>
+            <p class="font-bold text-neutral-400">No freebies or complimentary gifts logged yet</p>
+            <p class="text-[11px] text-neutral-500 mt-0.5">Use this tab when giving cracker boxes to family, staff, or courtesy contacts.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = freebies.map(f => {
+        const timeStr = new Date(f.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateStr = new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const itemsSummary = f.items.map(i => `${i.name} (${i.qty})`).join(', ');
+
+        return `
+          <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-3 flex flex-col gap-2 shadow-sm text-xs">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-white text-xs">${f.recipient}</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase bg-pink-500/20 text-pink-300 border border-pink-500/30">${f.category}</span>
+                  <span class="text-[9px] text-neutral-500 font-mono">${dateStr} ${timeStr}</span>
+                </div>
+                <p class="text-[11px] text-neutral-300 mt-1 leading-snug font-medium">📦 ${itemsSummary}</p>
+                ${f.notes && f.notes !== '-' ? `<p class="text-[10px] text-neutral-500 mt-0.5 italic">Note: ${f.notes}</p>` : ''}
+              </div>
+
+              <div class="text-right flex flex-col items-end gap-1">
+                <span class="font-mono font-black text-pink-400 text-sm leading-none">Cost: ₹${f.totalCost}</span>
+                <span class="text-[10px] text-neutral-500 font-mono">Retail: ₹${f.totalRetail}</span>
+                <button onclick="deleteFreebieEntry('${f.id}')" title="Restore stock and delete" class="mt-1 p-1 rounded-lg bg-neutral-800 text-neutral-400 hover:text-red-400 active:scale-95 transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-1.5 border-t border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-500">
+              <span>Dispatched by: <strong class="text-amber-400">${f.givenBy || 'Karan'}</strong></span>
+              <span>Total Boxes: <strong class="text-white font-mono">${f.totalBoxes}</strong></span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function openExpenseSheet() {
+      document.getElementById('sheetExpAmount').value = '';
+      document.getElementById('sheetExpNotes').value = '';
+
+      const backdrop = document.getElementById('expenseSheetBackdrop');
+      const drawer = document.getElementById('expenseSheetDrawer');
+      backdrop.classList.remove('hidden');
+      setTimeout(() => drawer.classList.remove('translate-y-full'), 10);
+    }
+
+    function closeExpenseSheet() {
+      const backdrop = document.getElementById('expenseSheetBackdrop');
+      const drawer = document.getElementById('expenseSheetDrawer');
+      drawer.classList.add('translate-y-full');
+      setTimeout(() => backdrop.classList.add('hidden'), 250);
+    }
+
+    async function handleExpenseSave(e) {
+      e.preventDefault();
+      const cat = document.getElementById('sheetExpCategory').value;
+      const amount = parseFloat(document.getElementById('sheetExpAmount').value) || 0;
+      const mode = document.getElementById('sheetExpMode').value;
+      const notes = document.getElementById('sheetExpNotes').value.trim() || '-';
+
+      const entry = {
+        id: `exp-${Date.now()}`,
+        category: cat,
+        amount: amount,
+        mode: mode,
+        notes: notes,
+        time: new Date().toISOString()
+      };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('expenses', entry.id), entry);
+        } catch(e) {
+          console.error("Error saving expense:", e);
+        }
+      } else {
+        expenses.unshift(entry);
+        renderExpensesView();
+        renderSummaryView();
+      }
+
+      await logAudit('expense', `Expense: ₹${amount}`, `${cat} (${mode.toUpperCase()}) &bull; ${notes}`);
+      closeExpenseSheet();
+      triggerToast(`Logged ₹${amount} expense`);
+    }
+
+    async function deleteExpenseEntry(id) {
+      if (db && currentUserAuth) {
+        try {
+          await deleteDoc(getDocRef('expenses', id));
+        } catch(e) {
+          console.error("Error deleting expense:", e);
+        }
+      } else {
+        expenses = expenses.filter(x => x.id !== id);
+        renderExpensesView();
+        renderSummaryView();
+      }
+
+      await logAudit('expense', `Expense entry removed`);
+      triggerToast('Expense deleted');
+    }
+
+    function renderExpensesView() {
+      const container = document.getElementById('expensesCardList');
+      const totalAmountEl = document.getElementById('totalExpenseAmount');
+      const totalCountEl = document.getElementById('totalExpenseCount');
+
+      const sum = expenses.reduce((acc, e) => acc + e.amount, 0);
+      if (totalAmountEl) totalAmountEl.innerText = `₹${sum}`;
+      if (totalCountEl) totalCountEl.innerText = expenses.length;
+
+      if (expenses.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-neutral-500 text-xs">No stall overhead expenses logged yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = expenses.map(e => `
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-3 flex items-center justify-between text-xs shadow-sm">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-white">${e.category}</span>
+              <span class="text-[9px] px-1 py-0.2 rounded bg-neutral-800 text-neutral-400 font-mono uppercase">${e.mode}</span>
+            </div>
+            <p class="text-[11px] text-neutral-400 mt-0.5">${e.notes}</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-black text-red-400 text-sm">₹${e.amount}</span>
+            <button onclick="deleteExpenseEntry('${e.id}')" class="p-1 rounded bg-neutral-800 text-neutral-400 hover:text-red-400">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function setHistoryFilter(filter) {
+      currentHistoryFilter = filter;
+      const ids = ['histFilterAll', 'histFilterBill', 'histFilterStock', 'histFilterExpense'];
+      ids.forEach(id => {
+        document.getElementById(id).className = "px-3 py-1 text-xs font-semibold rounded-xl bg-neutral-900 text-neutral-300 border border-neutral-800 whitespace-nowrap";
+      });
+
+      if (filter === 'all') document.getElementById('histFilterAll').className = "px-3 py-1 text-xs font-bold rounded-xl bg-amber-500 text-neutral-950 whitespace-nowrap";
+      if (filter === 'bill') document.getElementById('histFilterBill').className = "px-3 py-1 text-xs font-bold rounded-xl bg-amber-500 text-neutral-950 whitespace-nowrap";
+      if (filter === 'stock') document.getElementById('histFilterStock').className = "px-3 py-1 text-xs font-bold rounded-xl bg-amber-500 text-neutral-950 whitespace-nowrap";
+      if (filter === 'expense') document.getElementById('histFilterExpense').className = "px-3 py-1 text-xs font-bold rounded-xl bg-amber-500 text-neutral-950 whitespace-nowrap";
+
+      renderHistoryView();
+    }
+
+    function renderHistoryView() {
+      const container = document.getElementById('historyLogsContainer');
+      const countEl = document.getElementById('historyLogCount');
+      if (countEl) countEl.innerText = `${auditLogs.length} actions logged`;
+
+      let filtered = auditLogs;
+      if (currentHistoryFilter !== 'all') {
+        filtered = auditLogs.filter(l => l.type === currentHistoryFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-neutral-500 text-xs">No activity logged under this filter yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(log => {
+        const timeStr = new Date(log.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateStr = new Date(log.time).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+        let badgeColor = "bg-neutral-800 text-neutral-300";
+        let iconName = "activity";
+        if (log.type === 'bill') { badgeColor = "bg-amber-500/20 text-amber-400 border border-amber-500/40"; iconName = "receipt"; }
+        if (log.type === 'stock') { badgeColor = "bg-blue-500/20 text-blue-400 border border-blue-500/40"; iconName = "boxes"; }
+        if (log.type === 'expense') { badgeColor = "bg-red-500/20 text-red-400 border border-red-500/40"; iconName = "wallet"; }
+        if (log.type === 'system') { badgeColor = "bg-purple-500/20 text-purple-400 border border-purple-500/40"; iconName = "user"; }
+
+        return `
+          <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-2.5 flex items-start gap-2.5 text-xs">
+            <div class="p-2 rounded-xl ${badgeColor} mt-0.5">
+              <i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-bold text-white truncate">${log.title}</span>
+                <span class="text-[9px] text-neutral-500 whitespace-nowrap font-mono">${dateStr} ${timeStr}</span>
+              </div>
+              ${log.details ? `<p class="text-[11px] text-neutral-400 mt-0.5 leading-snug">${log.details}</p>` : ''}
+              <div class="mt-1 flex items-center gap-1.5 text-[9px] text-neutral-500">
+                <span class="text-amber-400 font-semibold font-mono">By: ${log.user}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderSummaryView() {
+      const totalSales = sales.reduce((acc, s) => acc + s.total, 0);
+      const totalGrossProfit = sales.reduce((acc, s) => acc + s.profit, 0);
+      const totalOverheads = expenses.reduce((acc, e) => acc + e.amount, 0);
+      const netProfit = totalGrossProfit - totalOverheads;
+
+      const totalFreebieCost = freebies.reduce((acc, f) => acc + f.totalCost, 0);
+      const totalFreebieBoxes = freebies.reduce((acc, f) => acc + f.totalBoxes, 0);
+
+      const cashCollection = sales.filter(s => s.payMode === 'cash').reduce((acc, s) => acc + s.total, 0);
+      const upiCollection = sales.filter(s => s.payMode === 'upi').reduce((acc, s) => acc + s.total, 0);
+      const totalItemsSold = sales.reduce((acc, s) => acc + s.items.reduce((sum, i) => sum + i.qty, 0), 0);
+
+      const sumTotalSalesEl = document.getElementById('sumTotalSales');
+      const sumNetProfitEl = document.getElementById('sumNetProfit');
+      const sumCashCollectionEl = document.getElementById('sumCashCollection');
+      const sumUpiCollectionEl = document.getElementById('sumUpiCollection');
+      const sumTotalOverheadsEl = document.getElementById('sumTotalOverheads');
+      const sumItemsSoldEl = document.getElementById('sumItemsSold');
+      const sumFreebiesCostEl = document.getElementById('sumFreebiesCost');
+      const sumFreebieBoxesEl = document.getElementById('sumFreebieBoxes');
+      const headerNetSummaryEl = document.getElementById('headerNetSummary');
+
+      if (sumTotalSalesEl) sumTotalSalesEl.innerText = `₹${totalSales}`;
+      if (sumNetProfitEl) sumNetProfitEl.innerText = `₹${netProfit}`;
+      if (sumCashCollectionEl) sumCashCollectionEl.innerText = `₹${cashCollection}`;
+      if (sumUpiCollectionEl) sumUpiCollectionEl.innerText = `₹${upiCollection}`;
+      if (sumTotalOverheadsEl) sumTotalOverheadsEl.innerText = `₹${totalOverheads}`;
+      if (sumItemsSoldEl) sumItemsSoldEl.innerText = `${totalItemsSold} boxes`;
+      if (sumFreebiesCostEl) sumFreebiesCostEl.innerText = `₹${totalFreebieCost}`;
+      if (sumFreebieBoxesEl) sumFreebieBoxesEl.innerText = `${totalFreebieBoxes} boxes`;
+      if (headerNetSummaryEl) headerNetSummaryEl.innerText = `₹${netProfit}`;
+
+      const container = document.getElementById('salesInvoiceList');
+      const countEl = document.getElementById('salesCountText');
+      if (countEl) countEl.innerText = `${sales.length} bills`;
+
+      if (!container) return;
+
+      if (sales.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-neutral-500 text-xs">No bills generated today yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = sales.slice(0, 30).map(s => {
+        const timeStr = new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-2.5 flex items-center justify-between text-xs">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono font-black text-amber-400">#${s.id}</span>
+                <span class="text-neutral-500 text-[10px]">${timeStr}</span>
+                <span class="text-[9px] px-1 bg-neutral-800 rounded font-bold text-neutral-300 uppercase">${s.payMode}</span>
+                ${s.createdBy ? `<span class="text-[8px] bg-neutral-950 border border-neutral-800 text-amber-300 px-1 rounded">${s.createdBy}</span>` : ''}
+              </div>
+              <span class="text-neutral-400 text-[11px] block mt-0.5">${s.customer.name} &bull; ${s.items.reduce((acc, i) => acc + i.qty, 0)} boxes</span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <span class="font-black text-white font-mono">₹${s.total}</span>
+              <button onclick="openEditBillDrawer('${s.id}')" title="Edit Bill" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-amber-400 active:scale-90 transition">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="reprintBill('${s.id}')" title="Reprint" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-amber-400 active:scale-90 transition">
+                <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function reprintBill(invoiceId) {
+      const inv = sales.find(s => s.id === invoiceId);
+      if (!inv) return;
+      currentReceiptInvoice = inv;
+      renderThermalReceipt(inv);
+      document.getElementById('receiptModal').classList.remove('hidden');
+    }
+
+    function openStallSettingsModal() {
+      document.getElementById('setStallName').value = stallSettings.name;
+      document.getElementById('setStallLoc').value = stallSettings.location;
+      document.getElementById('setStallPhone').value = stallSettings.phone;
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeStallSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function openCloudConfigModal() {
+      const modal = document.getElementById('cloudConfigModal');
+      const input = document.getElementById('firebaseConfigInput');
+      const current = getActiveFirebaseConfig();
+      if (input) {
+        input.value = current ? JSON.stringify(current, null, 2) : '';
+      }
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeCloudConfigModal() {
+      const modal = document.getElementById('cloudConfigModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveCloudConfig() {
+      const input = document.getElementById('firebaseConfigInput');
+      const raw = input?.value.trim();
+      if (!raw) {
+        triggerToast('Please paste your Firebase config');
+        return;
+      }
+
+      try {
+        let parsed = null;
+        if (raw.startsWith('{') && raw.endsWith('}')) {
+          parsed = JSON.parse(raw);
+        } else {
+          // Attempt parsing loose JS object
+          parsed = Function('"use strict";return (' + raw + ')')();
+        }
+
+        if (!parsed || !parsed.apiKey || !parsed.projectId) {
+          triggerToast('Invalid config! Make sure apiKey & projectId are present');
+          return;
+        }
+
+        localStorage.setItem('karan_fataka_firebase_config', JSON.stringify(parsed));
+        closeCloudConfigModal();
+        triggerToast('Cloud config saved! Reconnecting...');
+        initCloudSync();
+      } catch (err) {
+        console.error(err);
+        triggerToast('Invalid JSON format. Check console.');
+      }
+    }
+
+    function clearCloudConfig() {
+      localStorage.removeItem('karan_fataka_firebase_config');
+      const input = document.getElementById('firebaseConfigInput');
+      if (input) input.value = '';
+      closeCloudConfigModal();
+      triggerToast('Cloud config removed. Now running offline.');
+      initCloudSync();
+    }
+
+    async function saveStallSettings() {
+      const name = document.getElementById('setStallName').value.trim() || 'Karan Fataka';
+      const loc = document.getElementById('setStallLoc').value.trim() || 'Phadke Road';
+      const phone = document.getElementById('setStallPhone').value.trim() || '8879928546';
+
+      stallSettings = { name, location: loc, phone };
+
+      if (db && currentUserAuth) {
+        try {
+          await setDoc(getDocRef('settings', 'stall_config'), stallSettings);
+        } catch(e) {
+          console.error("Error saving stall settings:", e);
+        }
+      }
+
+      updateBrandUI();
+      closeStallSettingsModal();
+      triggerToast('Stall details updated in cloud');
+    }
+
+    function triggerToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('-translate-y-16');
+      setTimeout(() => toast.classList.add('-translate-y-16'), 2200);
+    }
+
+    Object.assign(window, {
+      switchNav,
+      addToCart,
+      changeCartQty,
+      removeFromCart,
+      clearCurrentCart,
+      openCheckoutSheet,
+      closeCheckoutSheet,
+      applyDiscountPreset,
+      handleCustomDiscount,
+      resetDiscount,
+      setPayMode,
+      setTenderExact,
+      setTenderAmount,
+      calcChangeReturn,
+      processOrderCheckout,
+      reprintBill,
+      closeReceiptModal,
+      sendWhatsAppReceipt,
+      openEditBillDrawer,
+      closeEditBillDrawer,
+      changeEditBillItemQty,
+      removeEditBillItem,
+      addItemToActiveEditBill,
+      calcEditBillTotals,
+      saveActiveEditedBill,
+      filterStockStatus,
+      adjustStockInline,
+      deleteProduct,
+      openProductSheet,
+      closeProductSheet,
+      handleProductSave,
+      openExpenseSheet,
+      closeExpenseSheet,
+      handleExpenseSave,
+      deleteExpenseEntry,
+      setHistoryFilter,
+      clearHistoryLogs,
+      openFreebieSheet,
+      closeFreebieSheet,
+      addCrackerToFreebieCart,
+      removeFreebieStagingItem,
+      handleFreebieDispatchSave,
+      deleteFreebieEntry,
+      openUserModal,
+      closeUserModal,
+      handleLoginUserChange,
+      togglePasswordVisibility,
+      handleLoginSubmit,
+      toggleOwnerStaffPanel,
+      addNewStaffMember,
+      promptAddNewCategory,
+      closeCategoryModal,
+      saveNewCategory,
+      selectCategory,
+      handleSearch,
+      clearSearch,
+      openStallSettingsModal,
+      closeStallSettingsModal,
+      saveStallSettings,
+      openCloudConfigModal,
+      closeCloudConfigModal,
+      saveCloudConfig,
+      clearCloudConfig
+    });
+
+    // Start application and establish cloud sync on window load
+    window.onload = function() {
+      initCloudSync();
+      lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
