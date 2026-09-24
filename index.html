@@ -24,7 +24,6 @@
     .safe-bottom {
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-    /* Hide scrollbar for clean mobile experience */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -51,40 +50,68 @@
 <body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black overflow-x-hidden">
 
   <!-- ========================================== -->
-  <!-- TOP APP HEADER & STATUS BAR -->
+  <!-- TOP APP HEADER & STATUS BAR (RESPONSIVE) -->
   <!-- ========================================== -->
   <header class="sticky top-0 z-40 bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800 safe-top">
-    <div class="px-3.5 py-2.5 flex items-center justify-between gap-2 max-w-lg mx-auto w-full">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3 max-w-7xl mx-auto w-full">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 shrink-0">
           <i data-lucide="sparkles" class="w-5 h-5 text-neutral-950"></i>
         </div>
         <div class="min-w-0">
-          <div class="flex items-center gap-1.5">
-            <h1 id="brandTitle" class="font-bold text-sm tracking-tight truncate text-neutral-100">Karan Fataka</h1>
-            <span class="text-[10px] text-amber-400 font-semibold px-1 rounded bg-amber-400/10">करण</span>
+          <div class="flex items-center gap-2">
+            <h1 id="brandTitle" class="font-extrabold text-sm md:text-base tracking-tight truncate text-neutral-100">Karan Fataka</h1>
+            <span class="text-[10px] text-amber-400 font-bold px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">करण</span>
           </div>
-          <div class="flex items-center gap-1.5 text-[11px] text-neutral-400">
-            <span id="brandLocation" class="truncate">Phadke Road</span>
+          <div class="flex items-center gap-2 text-[11px] text-neutral-400">
+            <span id="brandLocation" class="truncate font-medium">Phadke Road</span>
             <span class="text-neutral-600">•</span>
-            <span id="brandPhone" class="font-mono-num truncate">8879928546</span>
+            <span id="brandPhone" class="font-mono-num truncate text-neutral-300">8879928546</span>
           </div>
         </div>
       </div>
 
+      <!-- Desktop Navigation Tabs (Visible on screens >= 768px) -->
+      <nav class="hidden md:flex items-center gap-1 bg-neutral-950/80 border border-neutral-800 p-1 rounded-2xl">
+        <button onclick="window.switchTab('billing')" id="topTabNav-billing" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 shadow transition">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>Billing</span>
+        </button>
+        <button onclick="window.switchTab('stock')" id="topTabNav-stock" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition">
+          <i data-lucide="package" class="w-4 h-4"></i>
+          <span>Stock</span>
+        </button>
+        <button onclick="window.switchTab('freebies')" id="topTabNav-freebies" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition">
+          <i data-lucide="gift" class="w-4 h-4"></i>
+          <span>Freebies</span>
+        </button>
+        <button onclick="window.switchTab('expenses')" id="topTabNav-expenses" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition">
+          <i data-lucide="wallet" class="w-4 h-4"></i>
+          <span>Expenses</span>
+        </button>
+        <button onclick="window.switchTab('history')" id="topTabNav-history" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition">
+          <i data-lucide="history" class="w-4 h-4"></i>
+          <span>History</span>
+        </button>
+        <button onclick="window.switchTab('report')" id="topTabNav-report" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>Settlement</span>
+        </button>
+      </nav>
+
       <!-- User Profile, Cloud Status, and Lock Button -->
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button onclick="window.openCloudModal()" id="cloudStatusBadge" class="flex items-center gap-1 px-1.5 py-1 rounded-md bg-neutral-800/80 border border-neutral-700/80 text-[10px] font-semibold tracking-wider text-amber-400 active:scale-95 transition">
-          <span id="cloudStatusDot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-          <span id="cloudStatusText">OFFLINE</span>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="window.openCloudModal()" id="cloudStatusBadge" class="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-neutral-800/80 border border-neutral-700/80 text-[11px] font-bold tracking-wider text-amber-400 active:scale-95 transition">
+          <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span id="cloudStatusText" class="hidden sm:inline">OFFLINE</span>
         </button>
 
-        <button onclick="window.openUserModal()" class="flex items-center gap-1 px-2 py-1 rounded-lg bg-neutral-800 border border-neutral-700/80 active:scale-95 transition">
+        <button onclick="window.openUserModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-neutral-800 border border-neutral-700/80 active:scale-95 transition">
           <i data-lucide="user" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span id="headerUserName" class="text-xs font-semibold text-neutral-200 max-w-[65px] truncate">Staff</span>
+          <span id="headerUserName" class="text-xs font-bold text-neutral-200 max-w-[80px] truncate">Karan</span>
         </button>
 
-        <button onclick="window.lockApp()" title="Lock Terminal" class="p-1.5 rounded-lg bg-neutral-800 border border-neutral-700/80 text-neutral-300 hover:text-amber-400 active:scale-95 transition">
+        <button onclick="window.lockApp()" title="Lock Terminal" class="p-2 rounded-xl bg-neutral-800 border border-neutral-700/80 text-neutral-300 hover:text-amber-400 active:scale-95 transition">
           <i data-lucide="lock" class="w-4 h-4"></i>
         </button>
       </div>
@@ -92,237 +119,248 @@
   </header>
 
   <!-- ========================================== -->
-  <!-- MAIN APPLICATION SCREENS CONTAINER -->
+  <!-- MAIN APPLICATION SCREENS (RESPONSIVE) -->
   <!-- ========================================== -->
-  <main class="flex-1 max-w-lg mx-auto w-full pb-36 p-3">
+  <main class="flex-1 max-w-7xl mx-auto w-full pb-36 md:pb-24 p-3 md:p-6">
 
     <!-- 1. BILLING TAB VIEW -->
-    <section id="viewBilling" class="space-y-3">
+    <section id="viewBilling" class="space-y-4">
       <!-- Search & Category Swiper -->
-      <div class="space-y-2">
-        <div class="relative">
-          <i data-lucide="search" class="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
           <input 
             type="text" 
             id="searchInput" 
-            placeholder="Search sparkler, anaar, shots..." 
+            placeholder="Search sparkler, anaar, shots, ladi..." 
             oninput="window.handleSearch(this.value)"
-            class="w-full bg-neutral-900 border border-neutral-800 rounded-xl pl-9 pr-8 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-amber-500/80 transition"
+            class="w-full bg-neutral-900 border border-neutral-800 rounded-2xl pl-10 pr-9 py-2.5 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-amber-500 transition shadow-inner"
           >
-          <button id="searchClearBtn" onclick="window.clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200">
+          <button id="searchClearBtn" onclick="window.clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
         <!-- Categories horizontal pills -->
-        <div id="categoryPillsContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-medium">
+        <div id="categoryPillsContainer" class="flex gap-2 overflow-x-auto no-scrollbar py-0.5 text-xs font-semibold">
           <!-- Rendered dynamically -->
         </div>
       </div>
 
-      <!-- Cracker Cards Grid -->
-      <div id="crackerCardsGrid" class="grid grid-cols-2 gap-2">
+      <!-- Cracker Cards Grid: 2 cols on mobile, 3 on tablet, 4 to 6 on desktop -->
+      <div id="crackerCardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 2. STOCK INVENTORY VIEW -->
-    <section id="viewStock" class="hidden space-y-3">
-      <div class="flex items-center justify-between gap-2 bg-neutral-900/60 border border-neutral-800 p-2.5 rounded-xl">
+    <section id="viewStock" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-900/60 border border-neutral-800 p-3.5 rounded-2xl">
         <div>
-          <h2 class="text-sm font-bold text-neutral-100">Inventory Catalogue</h2>
-          <p class="text-[11px] text-neutral-400">Wholesale cost vs Selling margin</p>
+          <h2 class="text-base font-extrabold text-neutral-100">Inventory & Catalogue</h2>
+          <p class="text-xs text-neutral-400">Wholesale cost vs Selling margin and live box balances</p>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="window.openCategoryModal()" class="px-2 py-1 rounded-lg bg-neutral-800 border border-neutral-700 text-xs font-semibold text-neutral-300 hover:text-amber-400 transition">
+        <div class="flex items-center gap-2">
+          <button onclick="window.openCategoryModal()" class="px-3 py-1.5 rounded-xl bg-neutral-800 border border-neutral-700 text-xs font-bold text-neutral-200 hover:text-amber-400 transition">
             + Category
           </button>
-          <button onclick="window.openAddProductSheet()" class="px-2.5 py-1 rounded-lg bg-amber-500 text-neutral-950 text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition">
-            + Cracker
+          <button onclick="window.openAddProductSheet()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-neutral-950 text-xs font-extrabold shadow-md shadow-amber-500/20 active:scale-95 transition">
+            + Add Cracker
           </button>
         </div>
       </div>
 
       <!-- Stock filter pills -->
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
-        <button onclick="window.filterStockStatus('all')" id="stockFilterAll" class="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium">All</button>
-        <button onclick="window.filterStockStatus('low')" id="stockFilterLow" class="px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Low Stock (&lt;10)</button>
-        <button onclick="window.filterStockStatus('out')" id="stockFilterOut" class="px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Out of Stock</button>
+      <div class="flex gap-2 overflow-x-auto no-scrollbar text-xs">
+        <button onclick="window.filterStockStatus('all')" id="stockFilterAll" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">All Items</button>
+        <button onclick="window.filterStockStatus('low')" id="stockFilterLow" class="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Low Stock (&lt;10)</button>
+        <button onclick="window.filterStockStatus('out')" id="stockFilterOut" class="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Out of Stock</button>
       </div>
 
-      <!-- Stock Items List -->
-      <div id="stockListContainer" class="space-y-2">
+      <!-- Stock Items Responsive Grid -->
+      <div id="stockListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 3. FREEBIES VIEW -->
-    <section id="viewFreebies" class="hidden space-y-3">
-      <div class="flex items-center justify-between gap-2 bg-neutral-900/60 border border-neutral-800 p-2.5 rounded-xl">
+    <section id="viewFreebies" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-900/60 border border-neutral-800 p-3.5 rounded-2xl">
         <div>
-          <h2 class="text-sm font-bold text-neutral-100">Complimentary & Gifts</h2>
-          <p class="text-[11px] text-neutral-400">Track items given to family, staff & VIPs</p>
+          <h2 class="text-base font-extrabold text-neutral-100">Complimentary & Gifts</h2>
+          <p class="text-xs text-neutral-400">Track boxes gifted to family, staff, police, and VIPs</p>
         </div>
-        <button onclick="window.openFreebieSheet()" class="px-2.5 py-1 rounded-lg bg-amber-500 text-neutral-950 text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition">
+        <button onclick="window.openFreebieSheet()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-neutral-950 text-xs font-extrabold shadow-md shadow-amber-500/20 active:scale-95 transition">
           + Give Freebie
         </button>
       </div>
 
       <!-- Freebie Metrics -->
-      <div class="grid grid-cols-3 gap-2">
-        <div class="bg-neutral-900/80 border border-neutral-800 p-2.5 rounded-xl">
-          <p class="text-[10px] text-neutral-400 uppercase font-semibold">Boxes Given</p>
-          <p id="freebieTotalBoxes" class="text-base font-bold font-mono-num text-neutral-100">0</p>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl">
+          <p class="text-[11px] text-neutral-400 uppercase font-bold tracking-wider">Boxes Gifted</p>
+          <p id="freebieTotalBoxes" class="text-lg md:text-2xl font-extrabold font-mono-num text-neutral-100 mt-1">0</p>
         </div>
-        <div class="bg-neutral-900/80 border border-neutral-800 p-2.5 rounded-xl">
-          <p class="text-[10px] text-neutral-400 uppercase font-semibold">Cost Impact</p>
-          <p id="freebieTotalCost" class="text-base font-bold font-mono-num text-rose-400">₹0</p>
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl">
+          <p class="text-[11px] text-neutral-400 uppercase font-bold tracking-wider">Cost Impact</p>
+          <p id="freebieTotalCost" class="text-lg md:text-2xl font-extrabold font-mono-num text-rose-400 mt-1">₹0</p>
         </div>
-        <div class="bg-neutral-900/80 border border-neutral-800 p-2.5 rounded-xl">
-          <p class="text-[10px] text-neutral-400 uppercase font-semibold">Retail Val</p>
-          <p id="freebieTotalRetail" class="text-base font-bold font-mono-num text-amber-400">₹0</p>
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl">
+          <p class="text-[11px] text-neutral-400 uppercase font-bold tracking-wider">Retail Value</p>
+          <p id="freebieTotalRetail" class="text-lg md:text-2xl font-extrabold font-mono-num text-amber-400 mt-1">₹0</p>
         </div>
       </div>
 
-      <!-- Freebie Log Entries -->
-      <div id="freebieLogList" class="space-y-2">
+      <!-- Freebie Log Entries Grid -->
+      <div id="freebieLogList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 4. EXPENSES VIEW -->
-    <section id="viewExpenses" class="hidden space-y-3">
-      <div class="flex items-center justify-between gap-2 bg-neutral-900/60 border border-neutral-800 p-2.5 rounded-xl">
+    <section id="viewExpenses" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-900/60 border border-neutral-800 p-3.5 rounded-2xl">
         <div>
-          <h2 class="text-sm font-bold text-neutral-100">Stall Overheads</h2>
-          <p class="text-[11px] text-neutral-400">Rent, generator diesel, wages, snacks</p>
+          <h2 class="text-base font-extrabold text-neutral-100">Stall Overheads & Expenses</h2>
+          <p class="text-xs text-neutral-400">Ground rent, generator diesel, wages, snacks, tempo freight</p>
         </div>
-        <button onclick="window.openExpenseSheet()" class="px-2.5 py-1 rounded-lg bg-amber-500 text-neutral-950 text-xs font-bold shadow-md shadow-amber-500/20 active:scale-95 transition">
-          + Expense
+        <button onclick="window.openExpenseSheet()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-neutral-950 text-xs font-extrabold shadow-md shadow-amber-500/20 active:scale-95 transition">
+          + Add Expense
         </button>
       </div>
 
-      <div class="bg-neutral-900 border border-neutral-800 p-3 rounded-xl flex items-center justify-between">
+      <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl flex items-center justify-between">
         <div>
-          <p class="text-xs text-neutral-400">Total Stall Expenses</p>
-          <p id="totalExpenseAmount" class="text-xl font-bold font-mono-num text-rose-400">₹0</p>
+          <p class="text-xs font-semibold text-neutral-400">Total Stall Expenses</p>
+          <p id="totalExpenseAmount" class="text-2xl md:text-3xl font-extrabold font-mono-num text-rose-400 mt-0.5">₹0</p>
         </div>
-        <i data-lucide="receipt" class="w-8 h-8 text-neutral-700"></i>
+        <div class="w-12 h-12 rounded-2xl bg-neutral-800/80 flex items-center justify-center text-rose-400">
+          <i data-lucide="receipt" class="w-6 h-6"></i>
+        </div>
       </div>
 
-      <div id="expensesListContainer" class="space-y-2">
+      <div id="expensesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 5. AUDIT HISTORY VIEW -->
-    <section id="viewHistory" class="hidden space-y-3">
-      <div class="flex items-center justify-between gap-2 bg-neutral-900/60 border border-neutral-800 p-2.5 rounded-xl">
+    <section id="viewHistory" class="hidden space-y-4">
+      <div class="flex items-center justify-between gap-3 bg-neutral-900/60 border border-neutral-800 p-3.5 rounded-2xl">
         <div>
-          <h2 class="text-sm font-bold text-neutral-100">Audit History</h2>
-          <p class="text-[11px] text-neutral-400">Live log of all staff actions & edits</p>
+          <h2 class="text-base font-extrabold text-neutral-100">Audit History Timeline</h2>
+          <p class="text-xs text-neutral-400">Live tamper-proof log of staff transactions, edits & stock adjustments</p>
         </div>
-        <button onclick="window.clearHistoryLogs()" class="text-xs text-neutral-400 hover:text-rose-400 transition">
-          Clear
+        <button onclick="window.clearHistoryLogs()" class="text-xs font-bold text-neutral-400 hover:text-rose-400 transition">
+          Clear Logs
         </button>
       </div>
 
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
-        <button onclick="window.filterHistoryLogs('all')" id="histFilterAll" class="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium">All</button>
-        <button onclick="window.filterHistoryLogs('bill')" id="histFilterBill" class="px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Bills & Edits</button>
-        <button onclick="window.filterHistoryLogs('stock')" id="histFilterStock" class="px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Stock Updates</button>
-        <button onclick="window.filterHistoryLogs('expense')" id="histFilterExp" class="px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium">Expenses</button>
+      <div class="flex gap-2 overflow-x-auto no-scrollbar text-xs font-semibold">
+        <button onclick="window.filterHistoryLogs('all')" id="histFilterAll" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">All Logs</button>
+        <button onclick="window.filterHistoryLogs('bill')" id="histFilterBill" class="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800">Bills & Edits</button>
+        <button onclick="window.filterHistoryLogs('stock')" id="histFilterStock" class="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800">Stock Changes</button>
+        <button onclick="window.filterHistoryLogs('expense')" id="histFilterExp" class="px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800">Expenses</button>
       </div>
 
-      <div id="auditLogContainer" class="space-y-2">
+      <div id="auditLogContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 6. REPORT & SUMMARY VIEW -->
-    <section id="viewReport" class="hidden space-y-3">
-      <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl space-y-3">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-neutral-100">Stall Settlement (Z-Report)</h2>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold font-mono-num">TODAY</span>
+    <section id="viewReport" class="hidden space-y-5">
+      <div class="bg-neutral-900/80 border border-neutral-800 p-4 md:p-6 rounded-3xl space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
+          <div>
+            <h2 class="text-base md:text-lg font-extrabold text-neutral-100">Stall Settlement (Z-Report)</h2>
+            <p class="text-xs text-neutral-400">Real-time revenue, wholesale cracker cost and net profit</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold font-mono-num">TODAY LIVE</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">Total Sales Turnover</span>
-            <p id="repTurnover" class="text-lg font-bold font-mono-num text-neutral-100">₹0</p>
-            <span id="repBillCount" class="text-[10px] text-neutral-500">0 bills generated</span>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">Turnover</span>
+            <p id="repTurnover" class="text-lg md:text-xl font-extrabold font-mono-num text-neutral-100 mt-1">₹0</p>
+            <span id="repBillCount" class="text-[10px] text-neutral-500 block mt-0.5">0 bills</span>
           </div>
 
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">Net Estimated Profit</span>
-            <p id="repNetProfit" class="text-lg font-bold font-mono-num text-emerald-400">₹0</p>
-            <span id="repProfitMargin" class="text-[10px] text-emerald-500/80">0% margin</span>
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">Net Profit</span>
+            <p id="repNetProfit" class="text-lg md:text-xl font-extrabold font-mono-num text-emerald-400 mt-1">₹0</p>
+            <span id="repProfitMargin" class="text-[10px] text-emerald-500/80 block mt-0.5">0% margin</span>
           </div>
 
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">Wholesale Cracker Cost</span>
-            <p id="repWholesaleCost" class="text-sm font-bold font-mono-num text-neutral-300">₹0</p>
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">Wholesale Cost</span>
+            <p id="repWholesaleCost" class="text-lg md:text-xl font-extrabold font-mono-num text-neutral-300 mt-1">₹0</p>
+            <span class="text-[10px] text-neutral-500 block mt-0.5">cracker stock</span>
           </div>
 
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">Stall Overhead Expenses</span>
-            <p id="repExpenses" class="text-sm font-bold font-mono-num text-rose-400">₹0</p>
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">Overhead Outflow</span>
+            <p id="repExpenses" class="text-lg md:text-xl font-extrabold font-mono-num text-rose-400 mt-1">₹0</p>
+            <span class="text-[10px] text-neutral-500 block mt-0.5">expenses & gifts</span>
           </div>
 
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">Cash Collected</span>
-            <p id="repCash" class="text-sm font-bold font-mono-num text-amber-400">₹0</p>
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">Cash in Hand</span>
+            <p id="repCash" class="text-lg md:text-xl font-extrabold font-mono-num text-amber-400 mt-1">₹0</p>
+            <span class="text-[10px] text-neutral-500 block mt-0.5">cash collected</span>
           </div>
 
-          <div class="bg-neutral-950/60 p-2.5 rounded-xl border border-neutral-800/80">
-            <span class="text-[11px] text-neutral-400">UPI / QR Collected</span>
-            <p id="repUpi" class="text-sm font-bold font-mono-num text-sky-400">₹0</p>
+          <div class="bg-neutral-950/80 p-3.5 rounded-2xl border border-neutral-800/80">
+            <span class="text-[11px] text-neutral-400 font-semibold block">UPI / QR Bank</span>
+            <p id="repUpi" class="text-lg md:text-xl font-extrabold font-mono-num text-sky-400 mt-1">₹0</p>
+            <span class="text-[10px] text-neutral-500 block mt-0.5">online payments</span>
           </div>
         </div>
       </div>
 
-      <!-- Invoices History with Edit Function -->
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold text-neutral-300 uppercase tracking-wider px-1">Completed Invoices</h3>
-        <div id="invoicesListContainer" class="space-y-2">
+      <!-- Invoices History with Complete Edit & Delete Options -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-extrabold text-neutral-200 uppercase tracking-wider">Completed Sales Invoices</h3>
+          <span class="text-xs text-neutral-400">Tap ✏️ to edit items or delete bill</span>
+        </div>
+        <div id="invoicesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <!-- Rendered dynamically -->
         </div>
       </div>
     </section>
 
   </main>
-
   <!-- ========================================== -->
   <!-- FLOATING CART BAR (Shown when items > 0) -->
   <!-- ========================================== -->
-  <div id="floatingCartBar" class="hidden fixed bottom-20 left-3 right-3 max-w-lg mx-auto z-30">
-    <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-neutral-950 p-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-bounce-subtle">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-neutral-950 text-amber-400 flex items-center justify-center font-bold text-xs" id="floatingCartCount">
+  <div id="floatingCartBar" class="hidden fixed bottom-20 md:bottom-6 left-4 right-4 max-w-2xl mx-auto z-30">
+    <div class="bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 text-neutral-950 p-3.5 rounded-2xl shadow-2xl flex items-center justify-between gap-3 border border-amber-300">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-neutral-950 text-amber-400 flex items-center justify-center font-extrabold text-sm font-mono-num shadow" id="floatingCartCount">
           0
         </div>
         <div>
-          <span class="text-xs font-semibold text-neutral-900 block leading-tight">Total Payable</span>
-          <span class="text-base font-extrabold font-mono-num" id="floatingCartTotal">₹0</span>
+          <span class="text-xs font-bold text-neutral-900 block leading-tight">Total Bill Payable</span>
+          <span class="text-lg font-black font-mono-num" id="floatingCartTotal">₹0</span>
         </div>
       </div>
 
-      <button onclick="window.openCheckoutSheet()" class="px-4 py-2 rounded-xl bg-neutral-950 text-amber-400 font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition">
-        <span>Review & Bill</span>
+      <button onclick="window.openCheckoutSheet()" class="px-5 py-2.5 rounded-xl bg-neutral-950 text-amber-400 font-extrabold text-xs flex items-center gap-2 shadow-lg hover:bg-neutral-900 active:scale-95 transition">
+        <span>Review & Generate Bill</span>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
       </button>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- DOCKED BOTTOM NAVIGATION (6 TABS) -->
+  <!-- DOCKED BOTTOM NAVIGATION (FOR MOBILE PHONES) -->
   <!-- ========================================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-md border-t border-neutral-800 safe-bottom">
-    <div class="max-w-lg mx-auto grid grid-cols-6 px-1 py-1.5 text-center">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-md border-t border-neutral-800 safe-bottom">
+    <div class="max-w-md mx-auto grid grid-cols-6 px-1 py-1.5 text-center">
       <button onclick="window.switchTab('billing')" id="tabNav-billing" class="flex flex-col items-center gap-0.5 py-1 text-amber-400 transition">
         <i data-lucide="receipt" class="w-4 h-4"></i>
-        <span class="text-[10px] font-semibold">Billing</span>
+        <span class="text-[10px] font-bold">Billing</span>
       </button>
 
       <button onclick="window.switchTab('stock')" id="tabNav-stock" class="flex flex-col items-center gap-0.5 py-1 text-neutral-400 hover:text-neutral-200 transition">
@@ -351,51 +389,50 @@
       </button>
     </div>
   </nav>
-
   <!-- ========================================== -->
-  <!-- CHECKOUT & BILLING SLIDE-UP SHEET -->
+  <!-- CHECKOUT & BILLING MODAL (DESKTOP & MOBILE) -->
   <!-- ========================================== -->
-  <div id="checkoutSheet" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-neutral-900 border-t border-neutral-800 rounded-t-3xl max-w-lg mx-auto w-full max-h-[90vh] flex flex-col overflow-hidden">
+  <div id="checkoutSheet" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-t-3xl md:rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
       <!-- Sheet Header -->
-      <div class="p-3.5 border-b border-neutral-800 flex items-center justify-between">
+      <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
         <div>
-          <h3 class="text-sm font-bold text-neutral-100">Checkout Bill</h3>
-          <p class="text-[11px] text-neutral-400">Review items & finalize payment</p>
+          <h3 class="text-sm md:text-base font-extrabold text-neutral-100">Checkout Sales Bill</h3>
+          <p class="text-xs text-neutral-400">Review items & finalize settlement</p>
         </div>
-        <button onclick="window.closeCheckoutSheet()" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-neutral-200">
+        <button onclick="window.closeCheckoutSheet()" class="p-1.5 rounded-xl bg-neutral-800 text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
       <!-- Sheet Scroll Content -->
-      <div class="flex-1 overflow-y-auto p-3.5 space-y-3.5">
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
         <!-- Customer Details -->
         <div class="grid grid-cols-2 gap-2">
           <input type="text" id="custNameInput" placeholder="Customer Name (optional)" class="bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-amber-500">
-          <input type="tel" id="custPhoneInput" placeholder="Mobile Number (for WhatsApp)" class="bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-amber-500">
+          <input type="tel" id="custPhoneInput" placeholder="WhatsApp Phone No" class="bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-amber-500">
         </div>
 
         <!-- Cart Items List -->
-        <div class="space-y-1.5 max-h-48 overflow-y-auto" id="checkoutCartItemsList">
+        <div class="space-y-2 max-h-48 overflow-y-auto" id="checkoutCartItemsList">
           <!-- Rendered dynamically -->
         </div>
 
         <!-- Bargain Discounts Selector -->
-        <div class="space-y-1.5 bg-neutral-950 p-2.5 rounded-xl border border-neutral-800">
+        <div class="space-y-2 bg-neutral-950 p-3 rounded-2xl border border-neutral-800">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-neutral-300">Festival Bargain / Discount</span>
-            <span id="appliedDiscountDisplay" class="text-xs font-mono-num text-amber-400">₹0 off</span>
+            <span class="text-xs font-bold text-neutral-300">Diwali Bargain / Discount</span>
+            <span id="appliedDiscountDisplay" class="text-xs font-mono-num font-bold text-amber-400">₹0 off</span>
           </div>
           <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            <button onclick="window.setDiscount('flat', 0)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-neutral-400">None</button>
-            <button onclick="window.setDiscount('flat', 50)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-₹50</button>
-            <button onclick="window.setDiscount('flat', 100)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-₹100</button>
-            <button onclick="window.setDiscount('flat', 200)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-₹200</button>
-            <button onclick="window.setDiscount('pct', 5)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-5%</button>
-            <button onclick="window.setDiscount('pct', 10)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-10%</button>
-            <button onclick="window.setDiscount('pct', 15)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-15%</button>
-            <button onclick="window.setDiscount('pct', 20)" class="px-2 py-1 rounded bg-neutral-800 text-[11px] font-medium text-amber-400">-20%</button>
+            <button onclick="window.setDiscount('flat', 0)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-neutral-400">None</button>
+            <button onclick="window.setDiscount('flat', 50)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-₹50</button>
+            <button onclick="window.setDiscount('flat', 100)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-₹100</button>
+            <button onclick="window.setDiscount('flat', 200)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-₹200</button>
+            <button onclick="window.setDiscount('pct', 5)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-5%</button>
+            <button onclick="window.setDiscount('pct', 10)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-10%</button>
+            <button onclick="window.setDiscount('pct', 15)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-15%</button>
+            <button onclick="window.setDiscount('pct', 20)" class="px-2 py-1 rounded-lg bg-neutral-800 text-[11px] font-semibold text-amber-400">-20%</button>
           </div>
           <!-- Custom Exact Rupee Discount Input -->
           <div class="flex items-center gap-2 pt-1 border-t border-neutral-800/80">
@@ -422,35 +459,35 @@
         </div>
 
         <!-- Payment Mode Select -->
-        <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-          <button onclick="window.setPayMode('cash')" id="btnPayCash" class="py-2 rounded-xl bg-amber-500 text-neutral-950 flex items-center justify-center gap-1 border border-amber-500">
-            <i data-lucide="banknote" class="w-3.5 h-3.5"></i>
+        <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+          <button onclick="window.setPayMode('cash')" id="btnPayCash" class="py-2.5 rounded-xl bg-amber-500 text-neutral-950 flex items-center justify-center gap-1.5 border border-amber-500 transition">
+            <i data-lucide="banknote" class="w-4 h-4"></i>
             <span>Cash</span>
           </button>
-          <button onclick="window.setPayMode('upi')" id="btnPayUpi" class="py-2 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1 border border-neutral-800">
-            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+          <button onclick="window.setPayMode('upi')" id="btnPayUpi" class="py-2.5 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1.5 border border-neutral-800 transition">
+            <i data-lucide="qr-code" class="w-4 h-4"></i>
             <span>UPI / QR</span>
           </button>
-          <button onclick="window.setPayMode('split')" id="btnPaySplit" class="py-2 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1 border border-neutral-800">
-            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          <button onclick="window.setPayMode('split')" id="btnPaySplit" class="py-2.5 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1.5 border border-neutral-800 transition">
+            <i data-lucide="layers" class="w-4 h-4"></i>
             <span>Split</span>
           </button>
         </div>
 
         <!-- Cash Tender Change Calculator -->
-        <div id="cashCalculatorBox" class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 space-y-1.5">
+        <div id="cashCalculatorBox" class="bg-neutral-950 p-3 rounded-2xl border border-neutral-800 space-y-2">
           <div class="flex items-center justify-between text-xs">
-            <span class="text-neutral-400">Cash Received from Customer</span>
-            <input type="number" id="cashGivenInput" placeholder="₹ Amount" oninput="window.calcCashChange()" class="w-24 bg-neutral-900 border border-neutral-700 rounded-lg px-2 py-1 text-right font-mono-num text-xs text-neutral-100">
+            <span class="text-neutral-400 font-medium">Cash Received from Customer</span>
+            <input type="number" id="cashGivenInput" placeholder="₹ Amount" oninput="window.calcCashChange()" class="w-28 bg-neutral-900 border border-neutral-700 rounded-xl px-2.5 py-1.5 text-right font-mono-num text-xs text-neutral-100">
           </div>
-          <div class="flex items-center justify-between text-xs font-semibold pt-1 border-t border-neutral-800">
+          <div class="flex items-center justify-between text-xs font-bold pt-1.5 border-t border-neutral-800">
             <span class="text-neutral-400">Return Change</span>
-            <span id="cashChangeDisplay" class="font-mono-num text-emerald-400 text-sm">₹0</span>
+            <span id="cashChangeDisplay" class="font-mono-num text-emerald-400 text-base">₹0</span>
           </div>
         </div>
 
         <!-- Totals Breakdown -->
-        <div class="space-y-1 bg-neutral-950 p-3 rounded-xl border border-neutral-800 text-xs">
+        <div class="space-y-1.5 bg-neutral-950 p-3.5 rounded-2xl border border-neutral-800 text-xs">
           <div class="flex justify-between text-neutral-400">
             <span>Subtotal</span>
             <span id="checkoutSubtotal" class="font-mono-num text-neutral-200">₹0</span>
@@ -459,19 +496,19 @@
             <span>Discount Applied</span>
             <span id="checkoutDiscount" class="font-mono-num text-amber-400">-₹0</span>
           </div>
-          <div class="flex justify-between text-sm font-bold text-neutral-100 pt-1.5 border-t border-neutral-800">
+          <div class="flex justify-between text-sm font-extrabold text-neutral-100 pt-2 border-t border-neutral-800">
             <span>Grand Total</span>
-            <span id="checkoutGrandTotal" class="font-mono-num text-base text-amber-400">₹0</span>
+            <span id="checkoutGrandTotal" class="font-mono-num text-base md:text-lg text-amber-400">₹0</span>
           </div>
         </div>
       </div>
 
       <!-- Action Footer -->
-      <div class="p-3.5 border-t border-neutral-800 bg-neutral-900 flex gap-2">
-        <button onclick="window.clearActiveCart()" class="px-3 py-2.5 rounded-xl bg-neutral-800 text-neutral-300 text-xs font-semibold hover:text-rose-400">
+      <div class="p-4 border-t border-neutral-800 bg-neutral-900 flex gap-2">
+        <button onclick="window.clearActiveCart()" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-neutral-300 text-xs font-bold hover:text-rose-400 transition">
           Clear
         </button>
-        <button onclick="window.processOrderCheckout()" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition">
+        <button onclick="window.processOrderCheckout()" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <span>Complete Sale & Print Bill</span>
         </button>
@@ -480,54 +517,169 @@
   </div>
 
   <!-- ========================================== -->
+  <!-- MODAL: EDIT BILL COMPLETELY (ADD/REMOVE/DELETE) -->
+  <!-- ========================================== -->
+  <div id="editBillDrawer" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-t-3xl md:rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
+        <div>
+          <h3 id="editBillDrawerTitle" class="text-sm md:text-base font-extrabold text-neutral-100">Edit Bill #KF-XXXX</h3>
+          <p class="text-[11px] text-amber-400">Add/remove items, change prices, or delete bill</p>
+        </div>
+        <button onclick="window.closeEditBillDrawer()" class="p-1.5 rounded-xl bg-neutral-800 text-neutral-400 hover:text-neutral-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+        <div>
+          <label class="text-rose-400 font-bold block mb-1">Reason for Editing / Action * (Mandatory for Audit)</label>
+          <input type="text" id="editBillReason" placeholder="e.g. Returned 2 shots, added phuljhadi, customer wanted discount" class="w-full bg-neutral-950 border border-rose-500/50 rounded-xl px-3 py-2 text-neutral-100 focus:border-rose-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-neutral-400 block mb-1">Customer Name</label>
+            <input type="text" id="editBillCustName" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
+          </div>
+          <div>
+            <label class="text-neutral-400 block mb-1">Customer Phone</label>
+            <input type="tel" id="editBillCustPhone" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
+          </div>
+        </div>
+
+        <!-- Add New Item into this existing Bill -->
+        <div class="bg-neutral-950 p-3 rounded-2xl border border-neutral-800 space-y-2">
+          <label class="text-amber-400 font-bold block">+ Add Another Firecracker to this Bill</label>
+          <div class="flex gap-2">
+            <select id="editBillAddProdSelect" class="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-2.5 py-1.5 text-neutral-100 text-xs">
+              <!-- Rendered dynamically -->
+            </select>
+            <input type="number" id="editBillAddProdQty" min="1" value="1" class="w-16 bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-1.5 text-center text-neutral-100 font-mono-num text-xs">
+            <button type="button" onclick="window.addCrackerToEditBill()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 rounded-xl font-bold text-xs shrink-0">
+              + Add
+            </button>
+          </div>
+        </div>
+
+        <!-- Items in this Bill with Steppers & Delete -->
+        <div>
+          <label class="text-neutral-400 font-bold block mb-1.5">Items in this Bill (adjust qty or remove):</label>
+          <div id="editBillItemsList" class="space-y-1.5 bg-neutral-950 p-3 rounded-2xl border border-neutral-800 max-h-48 overflow-y-auto">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Discount & Payment Mode -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-neutral-400 block mb-1">Festival Discount (₹)</label>
+            <input type="number" id="editBillDiscount" min="0" oninput="window.calcEditBillTotals()" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 font-mono-num">
+          </div>
+          <div>
+            <label class="text-neutral-400 block mb-1">Payment Mode</label>
+            <select id="editBillPayMode" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI / QR</option>
+              <option value="split">Split</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Edit Bill Calculation Preview -->
+        <div class="bg-neutral-950 p-3 rounded-2xl border border-neutral-800 space-y-1">
+          <div class="flex justify-between text-neutral-400">
+            <span>Subtotal:</span>
+            <span id="editBillSubtotalPreview" class="font-mono-num text-neutral-200">₹0</span>
+          </div>
+          <div class="flex justify-between text-neutral-400">
+            <span>Discount:</span>
+            <span id="editBillDiscountPreview" class="font-mono-num text-amber-400">-₹0</span>
+          </div>
+          <div class="flex justify-between text-sm font-extrabold text-neutral-100 pt-1 border-t border-neutral-800">
+            <span>Updated Grand Total:</span>
+            <span id="editBillGrandTotalPreview" class="font-mono-num text-amber-400">₹0</span>
+          </div>
+        </div>
+
+        <!-- Delete Entire Bill Confirmation Section -->
+        <div id="deleteBillConfirmBox" class="hidden bg-rose-950/40 border border-rose-500/50 p-3 rounded-2xl space-y-2">
+          <p class="text-rose-300 font-bold text-xs">⚠️ Are you sure you want to completely delete this bill?</p>
+          <p class="text-[11px] text-neutral-400">All firecrackers from this bill will be returned to stall inventory and daily sales figures will be recalculated.</p>
+          <div class="flex gap-2">
+            <button type="button" onclick="window.confirmDeleteActiveBill()" class="flex-1 py-1.5 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-500">
+              Yes, Permanently Delete Bill
+            </button>
+            <button type="button" onclick="window.cancelDeleteActiveBill()" class="px-3 py-1.5 rounded-xl bg-neutral-800 text-neutral-300 font-bold text-xs">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="p-4 border-t border-neutral-800 bg-neutral-900 flex items-center justify-between gap-2">
+        <button type="button" onclick="window.promptDeleteActiveBill()" class="px-3 py-2.5 rounded-xl bg-rose-900/40 border border-rose-500/40 text-rose-400 hover:bg-rose-900/60 font-bold text-xs flex items-center gap-1.5 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Delete Bill</span>
+        </button>
+
+        <button onclick="window.saveActiveEditedBill()" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition">
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>Save Changes & Re-balance Stock</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ========================================== -->
   <!-- FULLSCREEN LOCK GATE / PIN LOGIN SCREEN -->
   <!-- ========================================== -->
   <div id="lockGateScreen" class="fixed inset-0 z-50 bg-neutral-950 flex flex-col items-center justify-center p-4">
-    <div class="w-full max-w-xs space-y-5 text-center">
+    <div class="w-full max-w-xs space-y-6 text-center">
       <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto shadow-2xl shadow-orange-500/30">
         <i data-lucide="sparkles" class="w-8 h-8 text-neutral-950"></i>
       </div>
 
       <div>
-        <h2 id="lockStallTitle" class="text-xl font-extrabold text-neutral-100 tracking-tight">Karan Fataka</h2>
-        <p id="lockStallSub" class="text-xs text-neutral-400 mt-0.5">Phadke Road • Stall POS Terminal</p>
+        <h2 id="lockStallTitle" class="text-2xl font-black text-neutral-100 tracking-tight">Karan Fataka</h2>
+        <p id="lockStallSub" class="text-xs text-neutral-400 mt-1 font-medium">Phadke Road • Terminal POS</p>
       </div>
 
-      <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 space-y-3.5 text-left">
+      <div class="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 space-y-4 text-left shadow-2xl">
         <div>
-          <label class="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block mb-1">Select Staff / Person</label>
-          <select id="lockUserSelect" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-neutral-100 focus:outline-none focus:border-amber-500">
+          <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Select Person / Operator</label>
+          <select id="lockUserSelect" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-amber-500">
             <!-- Rendered dynamically -->
           </select>
         </div>
 
         <div>
-          <label class="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block mb-1">PIN / Password</label>
-          <input type="password" id="lockPinInput" maxlength="8" placeholder="••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-center text-lg font-mono tracking-widest text-neutral-100 focus:outline-none focus:border-amber-500">
+          <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">PIN / Password</label>
+          <input type="password" id="lockPinInput" maxlength="8" placeholder="••••" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2.5 text-center text-lg font-mono tracking-widest text-neutral-100 focus:outline-none focus:border-amber-500">
         </div>
 
-        <button onclick="window.submitPinUnlock()" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 active:scale-95 transition">
+        <button onclick="window.submitPinUnlock()" class="w-full py-3 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-sm shadow-lg shadow-amber-500/20 active:scale-95 transition">
           Unlock Terminal
         </button>
       </div>
 
-      <p class="text-[11px] text-neutral-500">Default PIN for Karan: <span class="font-mono text-neutral-400 font-bold">1234</span></p>
+      <p class="text-xs text-neutral-500">Default PIN for Karan: <span class="font-mono text-neutral-400 font-bold">1234</span></p>
     </div>
   </div>
 
   <!-- ========================================== -->
   <!-- MODAL: ADD CRACKER TO STOCK -->
   <!-- ========================================== -->
-  <div id="addProductSheet" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-neutral-900 border-t border-neutral-800 rounded-t-3xl max-w-lg mx-auto w-full p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
-        <h3 class="text-sm font-bold text-neutral-100">Add New Firecracker Item</h3>
+  <div id="addProductSheet" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-t-3xl md:rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
+        <h3 class="text-sm font-extrabold text-neutral-100">Add Firecracker to Catalogue</h3>
         <button onclick="window.closeAddProductSheet()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <form onsubmit="window.handleProductSave(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="window.handleProductSave(event)" class="space-y-3 text-xs">
         <div>
           <label class="text-neutral-400 block mb-1">Cracker Name (e.g., 10cm Phuljhadi, 30 Shots)</label>
           <input type="text" id="entryProdName" required placeholder="Item Name" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
@@ -548,7 +700,7 @@
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="text-neutral-400 block mb-1">Wholesale Purchase Rate (₹)</label>
+            <label class="text-neutral-400 block mb-1">Wholesale Cost (₹)</label>
             <input type="number" id="entryProdCost" min="0" step="0.5" value="60" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
           </div>
           <div>
@@ -557,7 +709,7 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs mt-2">
+        <button type="submit" class="w-full py-3 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs mt-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
           Save Cracker to Catalogue
         </button>
       </form>
@@ -567,16 +719,16 @@
   <!-- ========================================== -->
   <!-- MODAL: GIVE FREEBIE -->
   <!-- ========================================== -->
-  <div id="freebieSheet" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-neutral-900 border-t border-neutral-800 rounded-t-3xl max-w-lg mx-auto w-full p-4 space-y-3 max-h-[85vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
-        <h3 class="text-sm font-bold text-neutral-100">Record Complimentary / Freebie</h3>
+  <div id="freebieSheet" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-t-3xl md:rounded-3xl max-w-lg w-full p-5 space-y-4 max-h-[88vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
+        <h3 class="text-sm font-extrabold text-neutral-100">Record Freebie / Complimentary Gift</h3>
         <button onclick="window.closeFreebieSheet()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-2 text-xs">
+      <div class="space-y-3 text-xs">
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="text-neutral-400 block mb-1">Recipient Name</label>
@@ -596,20 +748,18 @@
 
         <div>
           <label class="text-neutral-400 block mb-1">Notes / Reason</label>
-          <input type="text" id="freebieNotesInput" placeholder="e.g., Diwali gift box for house" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
+          <input type="text" id="freebieNotesInput" placeholder="e.g. Diwali gift box for house" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
         </div>
 
         <!-- Add Items to Freebie Basket -->
-        <div class="border border-neutral-800 rounded-xl p-2.5 space-y-2 bg-neutral-950">
-          <div class="flex items-center justify-between">
-            <span class="font-semibold text-neutral-300">Add Firecrackers</span>
-          </div>
+        <div class="border border-neutral-800 rounded-2xl p-3 space-y-2 bg-neutral-950">
+          <span class="font-bold text-neutral-300 block">Add Firecrackers:</span>
           <div class="flex gap-2">
-            <select id="freebieCrackerSelect" class="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1.5 text-neutral-100">
+            <select id="freebieCrackerSelect" class="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-2.5 py-1.5 text-neutral-100">
               <!-- Rendered dynamically -->
             </select>
-            <input type="number" id="freebieCrackerQty" min="1" value="1" class="w-16 bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1.5 text-center text-neutral-100 font-mono-num">
-            <button onclick="window.addCrackerToFreebieStaging()" class="px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-amber-400 rounded-lg font-bold">
+            <input type="number" id="freebieCrackerQty" min="1" value="1" class="w-16 bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-1.5 text-center text-neutral-100 font-mono-num">
+            <button onclick="window.addCrackerToFreebieStaging()" class="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-amber-400 rounded-xl font-bold">
               + Add
             </button>
           </div>
@@ -619,7 +769,7 @@
           </div>
         </div>
 
-        <button onclick="window.handleFreebieDispatchSave()" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs mt-2">
+        <button onclick="window.handleFreebieDispatchSave()" class="w-full py-3 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs mt-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
           Confirm Freebie & Deduct Stock
         </button>
       </div>
@@ -629,16 +779,16 @@
   <!-- ========================================== -->
   <!-- MODAL: ADD STALL EXPENSE -->
   <!-- ========================================== -->
-  <div id="expenseSheet" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-neutral-900 border-t border-neutral-800 rounded-t-3xl max-w-lg mx-auto w-full p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
-        <h3 class="text-sm font-bold text-neutral-100">Log Stall Overhead Expense</h3>
+  <div id="expenseSheet" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:justify-center md:items-center p-0 md:p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-t-3xl md:rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
+        <h3 class="text-sm font-extrabold text-neutral-100">Log Stall Overhead Expense</h3>
         <button onclick="window.closeExpenseSheet()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <form onsubmit="window.handleExpenseSave(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="window.handleExpenseSave(event)" class="space-y-3 text-xs">
         <div>
           <label class="text-neutral-400 block mb-1">Expense Category</label>
           <select id="sheetExpCategory" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
@@ -671,7 +821,7 @@
           <input type="text" id="sheetExpNotes" placeholder="e.g. 5 Litre Diesel for GenSet" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 focus:border-amber-500 focus:outline-none">
         </div>
 
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-500 text-neutral-950 font-bold text-xs mt-2">
+        <button type="submit" class="w-full py-3 rounded-xl bg-rose-500 text-neutral-950 font-extrabold text-xs mt-2 shadow-lg shadow-rose-500/20 active:scale-95 transition">
           Log Expense Entry
         </button>
       </form>
@@ -681,107 +831,46 @@
   <!-- ========================================== -->
   <!-- MODAL: ADD CUSTOM CATEGORY -->
   <!-- ========================================== -->
-  <div id="categoryModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-xs w-full p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
-        <h3 class="text-sm font-bold text-neutral-100">Add Cracker Category</h3>
+  <div id="categoryModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-xs w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+        <h3 class="text-sm font-extrabold text-neutral-100">Add Cracker Category</h3>
         <button onclick="window.closeCategoryModal()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-      <input type="text" id="customCatInput" placeholder="e.g. Rockets, Roll Caps, Fountains" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-100 focus:border-amber-500 focus:outline-none">
-      <button onclick="window.saveNewCategory()" class="w-full py-2 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs">
+      <input type="text" id="customCatInput" placeholder="e.g. Rockets, Roll Caps, Fountains" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs text-neutral-100 focus:border-amber-500 focus:outline-none">
+      <button onclick="window.saveNewCategory()" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs">
         Add Category
       </button>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- MODAL: MANAGE STAFF ACCOUNTS -->
+  <!-- MODAL: MANAGE PERSON / OPERATOR ACCOUNTS -->
   <!-- ========================================== -->
-  <div id="userModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-sm w-full p-4 space-y-3 max-h-[80vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
-        <h3 class="text-sm font-bold text-neutral-100">Manage Staff Accounts</h3>
+  <div id="userModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-sm w-full p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+        <h3 class="text-sm font-extrabold text-neutral-100">Registered Persons</h3>
         <button onclick="window.closeUserModal()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
       <div class="space-y-2">
-        <span class="text-xs text-neutral-400 block font-semibold">Registered Staff</span>
+        <span class="text-xs text-neutral-400 block font-bold">Terminal Users</span>
         <div id="staffUsersList" class="space-y-1.5">
           <!-- Rendered dynamically -->
         </div>
       </div>
 
-      <div class="border-t border-neutral-800 pt-2.5 space-y-2 text-xs">
-        <span class="font-semibold text-neutral-300 block">Add New Staff / Helper</span>
-        <input type="text" id="newStaffName" placeholder="Staff Name (e.g. Rahul, Sachin)" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
+      <div class="border-t border-neutral-800 pt-3 space-y-2 text-xs">
+        <span class="font-bold text-neutral-300 block">Register New Person</span>
+        <input type="text" id="newStaffName" placeholder="Name (e.g. Rahul, Sachin)" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
         <input type="password" id="newStaffPin" placeholder="4-Digit PIN" maxlength="6" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 font-mono">
-        <button onclick="window.addNewStaffMember()" class="w-full py-2 rounded-xl bg-neutral-800 text-amber-400 border border-neutral-700 font-bold text-xs">
-          + Register Staff
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- MODAL: EDIT GENERATED BILL -->
-  <!-- ========================================== -->
-  <div id="editBillDrawer" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-    <div class="bg-neutral-900 border-t border-neutral-800 rounded-t-3xl max-w-lg mx-auto w-full p-4 space-y-3 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
-        <div>
-          <h3 id="editBillDrawerTitle" class="text-sm font-bold text-neutral-100">Edit Bill #KF-XXXX</h3>
-          <p class="text-[11px] text-amber-400">Inventory will auto re-balance</p>
-        </div>
-        <button onclick="window.closeEditBillDrawer()" class="text-neutral-400 hover:text-neutral-200">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="space-y-2.5 text-xs">
-        <div>
-          <label class="text-rose-400 font-bold block mb-1">Reason for Editing Bill * (Mandatory)</label>
-          <input type="text" id="editBillReason" placeholder="e.g. Customer returned 2 sky shots, changed discount" class="w-full bg-neutral-950 border border-rose-500/50 rounded-xl px-3 py-2 text-neutral-100 focus:border-rose-500 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-neutral-400 block mb-1">Customer Name</label>
-            <input type="text" id="editBillCustName" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
-          </div>
-          <div>
-            <label class="text-neutral-400 block mb-1">Customer Phone</label>
-            <input type="tel" id="editBillCustPhone" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-neutral-400 block mb-1">Items in this Bill</label>
-          <div id="editBillItemsList" class="space-y-1.5 bg-neutral-950 p-2 rounded-xl border border-neutral-800 max-h-40 overflow-y-auto">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-neutral-400 block mb-1">Discount (₹)</label>
-            <input type="number" id="editBillDiscount" min="0" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100 font-mono-num">
-          </div>
-          <div>
-            <label class="text-neutral-400 block mb-1">Payment Mode</label>
-            <select id="editBillPayMode" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-neutral-100">
-              <option value="cash">Cash</option>
-              <option value="upi">UPI / QR</option>
-              <option value="split">Split</option>
-            </select>
-          </div>
-        </div>
-
-        <button onclick="window.saveActiveEditedBill()" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs mt-2 shadow-lg shadow-amber-500/20 active:scale-95 transition">
-          Update Bill & Adjust Stock
+        <button onclick="window.addNewStaffMember()" class="w-full py-2.5 rounded-xl bg-neutral-800 text-amber-400 border border-neutral-700 font-bold text-xs hover:bg-neutral-700 transition">
+          + Register Person
         </button>
       </div>
     </div>
@@ -790,32 +879,32 @@
   <!-- ========================================== -->
   <!-- MODAL: CLOUD SETTINGS & STATUS -->
   <!-- ========================================== -->
-  <div id="cloudModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl max-w-sm w-full p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
-        <h3 class="text-sm font-bold text-neutral-100">Database Connection</h3>
+  <div id="cloudModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+        <h3 class="text-sm font-extrabold text-neutral-100">Cloud Sync Status</h3>
         <button onclick="window.closeCloudModal()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-2 text-xs">
-        <div class="p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1">
+      <div class="space-y-2.5 text-xs">
+        <div class="p-3 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-neutral-400">Database Project:</span>
+            <span class="text-neutral-400">Firebase Database:</span>
             <span class="font-mono text-amber-400 font-bold">diwali-3bf4f</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-neutral-400">Sync Status:</span>
+            <span class="text-neutral-400">Connection:</span>
             <span id="modalCloudStateText" class="font-mono text-emerald-400 font-bold">SAVED LOCAL</span>
           </div>
         </div>
 
-        <p class="text-neutral-400 text-[11px] leading-relaxed">
-          All orders, stock adjustments, and overhead expenses are stored safely on this device and synced with your Firebase project in real time.
+        <p class="text-neutral-400 text-xs leading-relaxed">
+          Every bill generated, stock adjustment, freebie, and overhead expense is immediately stored on this device and automatically synchronized with all other connected stall phones via Firebase.
         </p>
 
-        <button onclick="window.closeCloudModal()" class="w-full py-2 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs">
+        <button onclick="window.closeCloudModal()" class="w-full py-2.5 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs">
           Done
         </button>
       </div>
@@ -826,8 +915,8 @@
   <!-- THERMAL RECEIPT MODAL -->
   <!-- ========================================== -->
   <div id="receiptModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-xs w-full p-4 space-y-3">
-      <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-neutral-800 pb-2.5">
         <h3 class="text-xs font-bold text-neutral-300">Sales Invoice</h3>
         <button onclick="window.closeReceiptModal()" class="text-neutral-400 hover:text-neutral-200">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -835,18 +924,18 @@
       </div>
 
       <!-- Printable Area -->
-      <div id="printableReceiptArea" class="bg-white text-neutral-950 p-4 rounded-xl font-mono text-[11px] space-y-2">
+      <div id="printableReceiptArea" class="bg-white text-neutral-950 p-4 rounded-2xl font-mono text-[11px] space-y-2">
         <!-- Rendered dynamically -->
       </div>
 
       <!-- Actions -->
       <div class="grid grid-cols-2 gap-2 text-xs">
-        <button onclick="window.printCurrentReceipt()" class="py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100 font-semibold flex items-center justify-center gap-1">
-          <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+        <button onclick="window.printCurrentReceipt()" class="py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-100 font-bold flex items-center justify-center gap-1.5">
+          <i data-lucide="printer" class="w-4 h-4"></i>
           <span>Print (58mm)</span>
         </button>
-        <button onclick="window.shareReceiptOnWhatsApp()" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center justify-center gap-1">
-          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        <button onclick="window.shareReceiptOnWhatsApp()" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-1.5">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
           <span>WhatsApp</span>
         </button>
       </div>
@@ -854,10 +943,9 @@
   </div>
 
   <!-- Toast Notification Container -->
-  <div id="toastMessage" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-neutral-800/95 border border-amber-500/40 text-neutral-100 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-xl shadow-black/50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-2">
+  <div id="toastMessage" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-neutral-800/95 border border-amber-500/40 text-neutral-100 px-4 py-2 rounded-full text-xs font-bold shadow-2xl pointer-events-none transition-all duration-300 opacity-0 -translate-y-2">
     Notification
   </div>
-
   <!-- ========================================== -->
   <!-- APPLICATION ENGINE & DATABASE LOGIC -->
   <!-- ========================================== -->
@@ -891,14 +979,14 @@
 
     /* Local Storage Keys */
     const STORAGE_KEYS = {
-      PRODUCTS: 'kf_pos_products_v3',
-      SALES: 'kf_pos_sales_v3',
-      EXPENSES: 'kf_pos_expenses_v3',
-      FREEBIES: 'kf_pos_freebies_v3',
-      AUDIT: 'kf_pos_audit_v3',
-      USERS: 'kf_pos_users_v3',
-      CATEGORIES: 'kf_pos_categories_v3',
-      SETTINGS: 'kf_pos_settings_v3'
+      PRODUCTS: 'kf_pos_products_v4',
+      SALES: 'kf_pos_sales_v4',
+      EXPENSES: 'kf_pos_expenses_v4',
+      FREEBIES: 'kf_pos_freebies_v4',
+      AUDIT: 'kf_pos_audit_v4',
+      USERS: 'kf_pos_users_v4',
+      CATEGORIES: 'kf_pos_categories_v4',
+      SETTINGS: 'kf_pos_settings_v4'
     };
 
     /* Default catalogue items if completely empty */
@@ -911,7 +999,7 @@
       { id: 'p6', name: 'Diwali Special Gift Box (Family)', category: 'GiftBoxes', stock: 15, purchase: 450, selling: 850 }
     ];
 
-    /* Default User */
+    /* Default User (Name only) */
     const DEFAULT_USERS = [
       { id: 'u1', name: 'Karan', pin: '1211' }
     ];
@@ -1015,16 +1103,16 @@
 
       if (dot) {
         dot.className = online 
-          ? 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' 
-          : 'w-1.5 h-1.5 rounded-full bg-amber-500';
+          ? 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse' 
+          : 'w-2 h-2 rounded-full bg-amber-500';
       }
       if (text) {
         text.innerText = online ? "CLOUD LIVE" : (label || "SAVED LOCAL");
       }
       if (badge) {
         badge.className = online 
-          ? 'flex items-center gap-1 px-1.5 py-1 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-[10px] font-semibold tracking-wider text-emerald-400 active:scale-95 transition'
-          : 'flex items-center gap-1 px-1.5 py-1 rounded-md bg-neutral-800/80 border border-neutral-700/80 text-[10px] font-semibold tracking-wider text-amber-400 active:scale-95 transition';
+          ? 'flex items-center gap-1.5 px-2 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-[11px] font-bold tracking-wider text-emerald-400 active:scale-95 transition'
+          : 'flex items-center gap-1.5 px-2 py-1 rounded-xl bg-neutral-800/80 border border-neutral-700/80 text-[11px] font-bold tracking-wider text-amber-400 active:scale-95 transition';
       }
       if (modalText) {
         modalText.innerText = online ? "CLOUD LIVE (CONNECTED)" : (label || "SAVED LOCAL");
@@ -1107,7 +1195,6 @@
         }
       }
     }
-
     function renderCategoryPills() {
       const container = document.getElementById('categoryPillsContainer');
       if (!container) return;
@@ -1118,7 +1205,7 @@
         return `
           <button 
             onclick="window.selectCategory('${cat}')" 
-            class="px-3 py-1.5 rounded-xl whitespace-nowrap transition active:scale-95 ${isActive ? 'bg-amber-500 text-neutral-950 font-bold shadow-md shadow-amber-500/20' : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-200'}"
+            class="px-3.5 py-1.5 rounded-xl whitespace-nowrap transition active:scale-95 ${isActive ? 'bg-amber-500 text-neutral-950 font-bold shadow-md shadow-amber-500/20' : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-200'}"
           >
             ${cat}
           </button>
@@ -1143,9 +1230,9 @@
 
       if (filtered.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-2 py-12 text-center text-neutral-500 space-y-2">
-            <i data-lucide="package-open" class="w-8 h-8 mx-auto text-neutral-600"></i>
-            <p class="text-xs">No firecrackers found in this category.</p>
+          <div class="col-span-full py-16 text-center text-neutral-500 space-y-2">
+            <i data-lucide="package-open" class="w-10 h-10 mx-auto text-neutral-600"></i>
+            <p class="text-sm font-medium">No firecrackers found in this category.</p>
           </div>
         `;
         lucide.createIcons();
@@ -1159,34 +1246,34 @@
         const isLowStock = item.stock > 0 && item.stock < 10;
 
         return `
-          <div class="bg-neutral-900/80 border border-neutral-800/80 rounded-2xl p-3 flex flex-col justify-between space-y-2 relative overflow-hidden transition active:border-neutral-700">
+          <div class="bg-neutral-900/80 border border-neutral-800/80 rounded-2xl p-3 md:p-4 flex flex-col justify-between space-y-3 relative overflow-hidden transition hover:border-neutral-700">
             <div>
-              <div class="flex items-center justify-between gap-1 mb-1">
-                <span class="text-[9px] uppercase tracking-wider font-semibold text-neutral-500 bg-neutral-950 px-1.5 py-0.5 rounded">${item.category}</span>
+              <div class="flex items-center justify-between gap-1 mb-1.5">
+                <span class="text-[9px] uppercase tracking-wider font-bold text-neutral-500 bg-neutral-950 px-2 py-0.5 rounded-md">${item.category}</span>
                 <span class="text-[10px] font-mono-num font-bold ${isOutOfStock ? 'text-rose-500' : isLowStock ? 'text-amber-400' : 'text-emerald-400'}">
                   ${isOutOfStock ? 'OUT' : item.stock + ' left'}
                 </span>
               </div>
-              <h4 class="text-xs font-bold text-neutral-100 leading-snug line-clamp-2">${item.name}</h4>
+              <h4 class="text-xs md:text-sm font-bold text-neutral-100 leading-snug line-clamp-2">${item.name}</h4>
             </div>
 
             <div class="pt-2 border-t border-neutral-800/60 flex items-center justify-between">
               <div>
-                <span class="text-xs font-bold font-mono-num text-amber-400">₹${item.selling}</span>
-                <span class="text-[9px] text-neutral-500 block">box rate</span>
+                <span class="text-sm font-black font-mono-num text-amber-400">₹${item.selling}</span>
+                <span class="text-[10px] text-neutral-500 block">box rate</span>
               </div>
 
               ${inCartQty > 0 ? `
                 <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-xl p-0.5">
-                  <button onclick="window.updateCartQty('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-neutral-900 text-amber-400 flex items-center justify-center font-bold text-xs">-</button>
-                  <span class="w-5 text-center text-xs font-bold font-mono-num text-amber-400">${inCartQty}</span>
-                  <button onclick="window.updateCartQty('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-amber-500 text-neutral-950 flex items-center justify-center font-bold text-xs">+</button>
+                  <button onclick="window.updateCartQty('${item.id}', -1)" class="w-7 h-7 rounded-lg bg-neutral-900 text-amber-400 flex items-center justify-center font-bold text-xs hover:bg-neutral-800 transition">-</button>
+                  <span class="w-6 text-center text-xs font-bold font-mono-num text-amber-400">${inCartQty}</span>
+                  <button onclick="window.updateCartQty('${item.id}', 1)" class="w-7 h-7 rounded-lg bg-amber-500 text-neutral-950 flex items-center justify-center font-bold text-xs hover:bg-amber-400 transition">+</button>
                 </div>
               ` : `
                 <button 
                   onclick="window.addToCart('${item.id}')" 
                   ${isOutOfStock ? 'disabled' : ''}
-                  class="px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 transition ${isOutOfStock ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'bg-amber-500 text-neutral-950 shadow-md shadow-amber-500/20'}"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 transition ${isOutOfStock ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 text-neutral-950 shadow-md shadow-amber-500/20'}"
                 >
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                   <span>ADD</span>
@@ -1282,20 +1369,20 @@
       if (!list) return;
 
       if (cart.length === 0) {
-        list.innerHTML = `<p class="text-xs text-neutral-500 py-2 text-center">Cart is empty</p>`;
+        list.innerHTML = `<p class="text-xs text-neutral-500 py-3 text-center">Cart is empty</p>`;
         return;
       }
 
       list.innerHTML = cart.map(item => `
-        <div class="flex items-center justify-between bg-neutral-950 p-2 rounded-xl border border-neutral-800 text-xs">
+        <div class="flex items-center justify-between bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 text-xs">
           <div class="min-w-0 pr-2">
             <span class="font-bold text-neutral-200 block truncate">${item.name}</span>
             <span class="text-neutral-500 font-mono-num text-[11px]">₹${item.selling} × ${item.qty} = ₹${item.selling * item.qty}</span>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="window.updateCartQty('${item.id}', -1)" class="w-6 h-6 rounded bg-neutral-800 text-neutral-300 font-bold">-</button>
-            <span class="w-5 text-center font-bold font-mono-num text-amber-400">${item.qty}</span>
-            <button onclick="window.updateCartQty('${item.id}', 1)" class="w-6 h-6 rounded bg-neutral-800 text-neutral-300 font-bold">+</button>
+            <button onclick="window.updateCartQty('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-neutral-800 text-neutral-300 font-bold hover:bg-neutral-700">-</button>
+            <span class="w-6 text-center font-bold font-mono-num text-amber-400">${item.qty}</span>
+            <button onclick="window.updateCartQty('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-neutral-800 text-neutral-300 font-bold hover:bg-neutral-700">+</button>
           </div>
         </div>
       `).join('');
@@ -1322,7 +1409,6 @@
       const change = Math.max(0, given - grandTotal);
       display.innerText = `₹${change}`;
     }
-
     async function processOrderCheckout() {
       if (cart.length === 0) {
         triggerToast('No items in cart');
@@ -1434,7 +1520,7 @@
           </div>
           ${inv.items.map(it => `
             <div class="flex justify-between text-[10px]">
-              <span class="truncate max-w-[120px]">${it.name}</span>
+              <span class="truncate max-w-[140px]">${it.name}</span>
               <span>${it.qty} × ₹${it.selling} = ₹${it.qty * it.selling}</span>
             </div>
           `).join('')}
@@ -1467,7 +1553,6 @@
         </div>
       `;
     }
-
     function renderStockView() {
       const container = document.getElementById('stockListContainer');
       if (!container) return;
@@ -1480,7 +1565,7 @@
       }
 
       if (list.length === 0) {
-        container.innerHTML = `<p class="text-xs text-neutral-500 py-6 text-center">No inventory items match filter.</p>`;
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-500 text-xs">No inventory items match filter.</div>`;
         return;
       }
 
@@ -1489,30 +1574,30 @@
         const marginPct = item.purchase > 0 ? Math.round((margin / item.purchase) * 100) : 0;
 
         return `
-          <div class="bg-neutral-900/80 border border-neutral-800 p-3 rounded-2xl flex items-center justify-between gap-2">
+          <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow">
             <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 mb-0.5">
-                <span class="text-[9px] uppercase tracking-wider font-semibold text-neutral-400 bg-neutral-950 px-1.5 py-0.5 rounded">${item.category}</span>
-                <span class="text-[10px] font-bold font-mono-num ${item.stock <= 0 ? 'text-rose-500' : item.stock < 10 ? 'text-amber-400' : 'text-emerald-400'}">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-[9px] uppercase tracking-wider font-bold text-neutral-400 bg-neutral-950 px-2 py-0.5 rounded-md">${item.category}</span>
+                <span class="text-[11px] font-bold font-mono-num ${item.stock <= 0 ? 'text-rose-500' : item.stock < 10 ? 'text-amber-400' : 'text-emerald-400'}">
                   ${item.stock} in stock
                 </span>
               </div>
-              <h4 class="text-xs font-bold text-neutral-100 truncate">${item.name}</h4>
-              <div class="flex items-center gap-2 text-[10px] text-neutral-400 mt-0.5 font-mono-num">
+              <h4 class="text-xs md:text-sm font-bold text-neutral-100 truncate">${item.name}</h4>
+              <div class="flex items-center gap-2 text-[10px] text-neutral-400 mt-1 font-mono-num">
                 <span>Cost: ₹${item.purchase}</span>
                 <span>•</span>
                 <span>Sell: ₹${item.selling}</span>
-                <span class="text-emerald-400 font-semibold">(+₹${margin} / +${marginPct}%)</span>
+                <span class="text-emerald-400 font-bold">(+₹${margin} / +${marginPct}%)</span>
               </div>
             </div>
 
             <!-- Quick Adjust Steppers -->
-            <div class="flex items-center gap-1">
-              <button onclick="window.adjustStockInline('${item.id}', -1)" class="w-7 h-7 rounded-lg bg-neutral-800 text-neutral-300 font-bold text-xs">-1</button>
-              <button onclick="window.adjustStockInline('${item.id}', 1)" class="w-7 h-7 rounded-lg bg-neutral-800 text-amber-400 font-bold text-xs">+1</button>
-              <button onclick="window.adjustStockInline('${item.id}', 10)" class="w-8 h-7 rounded-lg bg-neutral-800 text-emerald-400 font-bold text-xs">+10</button>
-              <button onclick="window.deleteProduct('${item.id}')" class="p-1.5 rounded-lg text-neutral-500 hover:text-rose-400">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="window.adjustStockInline('${item.id}', -1)" class="w-7 h-7 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold text-xs transition">-1</button>
+              <button onclick="window.adjustStockInline('${item.id}', 1)" class="w-7 h-7 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-bold text-xs transition">+1</button>
+              <button onclick="window.adjustStockInline('${item.id}', 10)" class="w-8 h-7 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-emerald-400 font-bold text-xs transition">+10</button>
+              <button onclick="window.deleteProduct('${item.id}')" title="Delete Cracker" class="p-1.5 rounded-xl text-neutral-500 hover:text-rose-400 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
             </div>
           </div>
@@ -1567,7 +1652,6 @@
       await logAudit('stock', `Cracker Removed: ${name}`, `Deleted by ${currentUser ? currentUser.name : 'Staff'}`);
       triggerToast(`Removed ${name}`);
     }
-
     function renderFreebiesView() {
       const listContainer = document.getElementById('freebieLogList');
       const totalBoxesEl = document.getElementById('freebieTotalBoxes');
@@ -1585,36 +1669,36 @@
       if (!listContainer) return;
 
       if (freebies.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-neutral-500 py-6 text-center">No complimentary items logged yet.</p>`;
+        listContainer.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-500 text-xs">No complimentary items logged yet.</div>`;
         return;
       }
 
       listContainer.innerHTML = freebies.map(fb => `
-        <div class="bg-neutral-900/80 border border-neutral-800 p-3 rounded-2xl space-y-2">
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl space-y-2.5 shadow">
           <div class="flex items-center justify-between">
             <div>
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-2">
                 <span class="text-xs font-bold text-neutral-100">${fb.recipient}</span>
-                <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-semibold">${fb.category}</span>
+                <span class="text-[9px] uppercase px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold">${fb.category}</span>
               </div>
-              <span class="text-[10px] text-neutral-500">${new Date(fb.date).toLocaleDateString()} • Given by: ${fb.givenBy || 'Staff'}</span>
+              <span class="text-[10px] text-neutral-500 block mt-0.5">${new Date(fb.date).toLocaleDateString()} • Given by: ${fb.givenBy || 'Staff'}</span>
             </div>
             <button onclick="window.deleteFreebieEntry('${fb.id}')" class="text-neutral-500 hover:text-rose-400 p-1">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
 
-          <div class="text-[11px] text-neutral-300 space-y-0.5">
+          <div class="text-xs text-neutral-300 space-y-1 bg-neutral-950 p-2 rounded-xl">
             ${fb.items.map(it => `
               <div class="flex justify-between">
                 <span>${it.name}</span>
-                <span class="font-mono-num text-neutral-400">${it.qty} boxes</span>
+                <span class="font-mono-num text-amber-400 font-bold">${it.qty} boxes</span>
               </div>
             `).join('')}
           </div>
 
-          <div class="flex justify-between text-[10px] text-neutral-400 pt-1.5 border-t border-neutral-800/80 font-mono-num">
-            <span>Wholesale Cost: ₹${fb.totalCost}</span>
+          <div class="flex justify-between text-[11px] text-neutral-400 pt-1.5 border-t border-neutral-800/80 font-mono-num">
+            <span>Wholesale: ₹${fb.totalCost}</span>
             <span>Retail Val: ₹${fb.totalRetail}</span>
           </div>
         </div>
@@ -1745,24 +1829,24 @@
       if (!container) return;
 
       if (expenses.length === 0) {
-        container.innerHTML = `<p class="text-xs text-neutral-500 py-6 text-center">No overhead expenses recorded yet.</p>`;
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-500 text-xs">No overhead expenses recorded yet.</div>`;
         return;
       }
 
       container.innerHTML = expenses.map(exp => `
-        <div class="bg-neutral-900/80 border border-neutral-800 p-3 rounded-2xl flex items-center justify-between">
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl flex items-center justify-between shadow">
           <div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-2">
               <span class="text-xs font-bold text-neutral-100">${exp.category}</span>
-              <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 font-semibold">${exp.mode}</span>
+              <span class="text-[9px] uppercase px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-400 font-bold">${exp.mode}</span>
             </div>
-            <p class="text-[11px] text-neutral-400">${exp.notes}</p>
+            <p class="text-xs text-neutral-400 mt-1">${exp.notes}</p>
             <span class="text-[10px] text-neutral-500 font-mono-num">${new Date(exp.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-bold font-mono-num text-rose-400">₹${exp.amount}</span>
+          <div class="flex items-center gap-2.5">
+            <span class="text-base font-extrabold font-mono-num text-rose-400">₹${exp.amount}</span>
             <button onclick="window.deleteExpenseEntry('${exp.id}')" class="text-neutral-500 hover:text-rose-400 p-1">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
@@ -1858,28 +1942,28 @@
       if (!invoicesList) return;
 
       if (sales.length === 0) {
-        invoicesList.innerHTML = `<p class="text-xs text-neutral-500 py-6 text-center">No sales invoices generated yet.</p>`;
+        invoicesList.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-500 text-xs">No sales invoices generated yet.</div>`;
         return;
       }
 
       invoicesList.innerHTML = sales.map(inv => `
-        <div class="bg-neutral-900/80 border border-neutral-800 p-3 rounded-2xl flex items-center justify-between">
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl flex items-center justify-between shadow">
           <div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-2">
               <span class="text-xs font-bold text-neutral-100">${inv.id}</span>
-              <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400 font-semibold">${inv.payMode}</span>
+              <span class="text-[9px] uppercase px-2 py-0.5 rounded-md bg-neutral-800 text-amber-400 font-bold">${inv.payMode}</span>
             </div>
-            <p class="text-[11px] text-neutral-400">${inv.customer.name}</p>
+            <p class="text-xs text-neutral-400 mt-0.5">${inv.customer.name}</p>
             <span class="text-[10px] text-neutral-500 font-mono-num">${new Date(inv.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • ${inv.items.length} items</span>
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold font-mono-num text-neutral-100">₹${inv.total}</span>
-            <button onclick="window.viewReceipt('${inv.id}')" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-amber-400">
-              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            <span class="text-sm md:text-base font-extrabold font-mono-num text-neutral-100 mr-1">₹${inv.total}</span>
+            <button onclick="window.viewReceipt('${inv.id}')" title="View Receipt" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 hover:text-amber-400 hover:bg-neutral-700 transition">
+              <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
-            <button onclick="window.openEditBillDrawer('${inv.id}')" class="p-1.5 rounded-lg bg-neutral-800 text-neutral-300 hover:text-amber-400">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <button onclick="window.openEditBillDrawer('${inv.id}')" title="Edit Bill / Delete" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 hover:text-amber-400 hover:bg-neutral-700 transition">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
@@ -1887,7 +1971,6 @@
 
       lucide.createIcons();
     }
-
     function openEditBillDrawer(invId) {
       const inv = sales.find(s => s.id === invId);
       if (!inv) return;
@@ -1900,7 +1983,19 @@
       document.getElementById('editBillDiscount').value = inv.discount || 0;
       document.getElementById('editBillPayMode').value = inv.payMode || 'cash';
 
+      /* Populate the Add Product selector in edit drawer */
+      const select = document.getElementById('editBillAddProdSelect');
+      if (select) {
+        select.innerHTML = products.map(p => `
+          <option value="${p.id}">${p.name} (₹${p.selling})</option>
+        `).join('');
+      }
+
+      /* Hide any pending delete confirmation */
+      document.getElementById('deleteBillConfirmBox')?.classList.add('hidden');
+
       renderEditBillItemsList();
+      calcEditBillTotals();
       document.getElementById('editBillDrawer')?.classList.remove('hidden');
     }
 
@@ -1908,16 +2003,67 @@
       const list = document.getElementById('editBillItemsList');
       if (!list || !activeEditInvoice) return;
 
+      if (!activeEditInvoice.items || activeEditInvoice.items.length === 0) {
+        list.innerHTML = `<p class="text-xs text-neutral-500 py-3 text-center">No items in this bill. Use the selector above to add firecrackers.</p>`;
+        calcEditBillTotals();
+        return;
+      }
+
       list.innerHTML = activeEditInvoice.items.map(item => `
-        <div class="flex items-center justify-between text-xs py-1 border-b border-neutral-900 last:border-0">
-          <span class="truncate max-w-[140px] text-neutral-200">${item.name}</span>
-          <div class="flex items-center gap-1 font-mono-num">
-            <button onclick="window.updateEditBillQty('${item.id}', -1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold">-</button>
-            <span class="w-6 text-center text-amber-400">${item.qty}</span>
-            <button onclick="window.updateEditBillQty('${item.id}', 1)" class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 font-bold">+</button>
+        <div class="flex items-center justify-between text-xs py-2 border-b border-neutral-900 last:border-0 gap-2">
+          <div class="min-w-0 flex-1">
+            <span class="truncate block text-neutral-200 font-bold">${item.name}</span>
+            <span class="text-[10px] text-neutral-500 font-mono-num">₹${item.selling} each • Line Total: ₹${item.selling * item.qty}</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 font-mono-num">
+            <button type="button" onclick="window.updateEditBillQty('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center hover:bg-neutral-700">-</button>
+            <span class="w-6 text-center text-amber-400 font-bold">${item.qty}</span>
+            <button type="button" onclick="window.updateEditBillQty('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-neutral-800 text-neutral-300 font-bold flex items-center justify-center hover:bg-neutral-700">+</button>
+            <button type="button" onclick="window.removeCrackerFromEditBill('${item.id}')" title="Remove item" class="p-1.5 rounded-lg text-neutral-500 hover:text-rose-400 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
         </div>
       `).join('');
+
+      lucide.createIcons();
+      calcEditBillTotals();
+    }
+
+    function addCrackerToEditBill() {
+      if (!activeEditInvoice) return;
+      const select = document.getElementById('editBillAddProdSelect');
+      const qtyInput = document.getElementById('editBillAddProdQty');
+      const prodId = select?.value;
+      const qty = parseInt(qtyInput?.value) || 1;
+
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const existing = activeEditInvoice.items.find(i => i.id === prodId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        activeEditInvoice.items.push({
+          id: prod.id,
+          name: prod.name,
+          category: prod.category,
+          purchase: prod.purchase,
+          selling: prod.selling,
+          qty: qty
+        });
+      }
+
+      qtyInput.value = 1;
+      renderEditBillItemsList();
+      triggerToast(`Added ${prod.name}`);
+    }
+
+    function removeCrackerFromEditBill(prodId) {
+      if (!activeEditInvoice) return;
+      activeEditInvoice.items = activeEditInvoice.items.filter(i => i.id !== prodId);
+      renderEditBillItemsList();
     }
 
     function updateEditBillQty(prodId, delta) {
@@ -1932,6 +2078,24 @@
       renderEditBillItemsList();
     }
 
+    function calcEditBillTotals() {
+      if (!activeEditInvoice) return;
+      const subtotal = (activeEditInvoice.items || []).reduce((sum, item) => sum + (item.selling * item.qty), 0);
+      const discountInput = document.getElementById('editBillDiscount');
+      const discount = Math.min(subtotal, Math.max(0, parseFloat(discountInput?.value) || 0));
+      const grandTotal = Math.max(0, subtotal - discount);
+
+      const subtotalEl = document.getElementById('editBillSubtotalPreview');
+      const discountEl = document.getElementById('editBillDiscountPreview');
+      const grandTotalEl = document.getElementById('editBillGrandTotalPreview');
+
+      if (subtotalEl) subtotalEl.innerText = `₹${subtotal}`;
+      if (discountEl) discountEl.innerText = `-₹${discount}`;
+      if (grandTotalEl) grandTotalEl.innerText = `₹${grandTotal}`;
+
+      return { subtotal, discount, grandTotal };
+    }
+
     async function saveActiveEditedBill() {
       if (!activeEditInvoice) return;
 
@@ -1942,13 +2106,16 @@
         return;
       }
 
+      if (!activeEditInvoice.items || activeEditInvoice.items.length === 0) {
+        triggerToast('⚠️ Bill must contain at least 1 item (or delete the bill)');
+        return;
+      }
+
       const origIdx = sales.findIndex(s => s.id === activeEditInvoice.id);
       if (origIdx === -1) return;
       const origInv = sales[origIdx];
 
-      const subtotal = activeEditInvoice.items.reduce((sum, item) => sum + (item.selling * item.qty), 0);
-      const discount = parseFloat(document.getElementById('editBillDiscount')?.value) || 0;
-      const grandTotal = Math.max(0, subtotal - discount);
+      const { subtotal, discount, grandTotal } = calcEditBillTotals();
       const cost = activeEditInvoice.items.reduce((sum, item) => sum + (item.purchase * item.qty), 0);
       const profit = Math.max(0, grandTotal - cost);
 
@@ -1970,7 +2137,9 @@
         editedAt: new Date().toISOString()
       };
 
-      /* Balance Stock */
+      /* Stock Re-balancing:
+         1. Restore all original items back into stock
+         2. Deduct all newly configured items from stock */
       origInv.items.forEach(oldItem => {
         const p = products.find(prod => prod.id === oldItem.id);
         if (p) p.stock += oldItem.qty;
@@ -1989,13 +2158,13 @@
 
       if (db) {
         try {
-          for (const oldItem of origInv.items) {
-            const p = products.find(prod => prod.id === oldItem.id);
-            if (p) await updateDoc(doc(db, 'products', oldItem.id), { stock: p.stock });
-          }
-          for (const newItem of activeEditInvoice.items) {
-            const p = products.find(prod => prod.id === newItem.id);
-            if (p) await updateDoc(doc(db, 'products', newItem.id), { stock: p.stock });
+          const impactedProductIds = new Set([
+            ...origInv.items.map(i => i.id),
+            ...activeEditInvoice.items.map(i => i.id)
+          ]);
+          for (const pid of impactedProductIds) {
+            const p = products.find(prod => prod.id === pid);
+            if (p) await updateDoc(doc(db, 'products', pid), { stock: p.stock });
           }
           await setDoc(doc(db, 'sales', updatedBill.id), updatedBill);
         } catch(e) {
@@ -2013,6 +2182,67 @@
       triggerToast(`Bill #${updatedBill.id} updated!`);
     }
 
+    function promptDeleteActiveBill() {
+      const box = document.getElementById('deleteBillConfirmBox');
+      if (box) box.classList.remove('hidden');
+    }
+
+    function cancelDeleteActiveBill() {
+      const box = document.getElementById('deleteBillConfirmBox');
+      if (box) box.classList.add('hidden');
+    }
+
+    async function confirmDeleteActiveBill() {
+      if (!activeEditInvoice) return;
+
+      const reason = document.getElementById('editBillReason')?.value.trim();
+      if (!reason || reason.length < 3) {
+        triggerToast('⚠️ Please enter reason for deleting this bill');
+        document.getElementById('editBillReason')?.focus();
+        return;
+      }
+
+      const origIdx = sales.findIndex(s => s.id === activeEditInvoice.id);
+      if (origIdx === -1) return;
+      const origInv = sales[origIdx];
+
+      /* Return all items from this bill back into live stall stock */
+      origInv.items.forEach(item => {
+        const prod = products.find(p => p.id === item.id);
+        if (prod) prod.stock += item.qty;
+      });
+
+      /* Remove from sales records */
+      sales.splice(origIdx, 1);
+
+      persistLocal(STORAGE_KEYS.PRODUCTS, products);
+      persistLocal(STORAGE_KEYS.SALES, sales);
+      renderStockView();
+      renderCrackerCards();
+      renderSummaryView();
+
+      /* Sync stock restoration and bill deletion with Firebase */
+      if (db) {
+        try {
+          for (const item of origInv.items) {
+            const prod = products.find(p => p.id === item.id);
+            if (prod) await updateDoc(doc(db, 'products', item.id), { stock: prod.stock });
+          }
+          await deleteDoc(doc(db, 'sales', origInv.id));
+        } catch (err) {
+          console.warn("Delete bill cloud sync notice:", err);
+        }
+      }
+
+      await logAudit(
+        'bill',
+        `Bill #${origInv.id} DELETED (₹${origInv.total})`,
+        `Reason: "${reason}". All ${origInv.items.reduce((s,i) => s + i.qty, 0)} boxes restored to inventory by ${currentUser ? currentUser.name : 'Staff'}`
+      );
+
+      closeEditBillDrawer();
+      triggerToast(`Bill #${origInv.id} deleted & stock restored`);
+    }
     function renderHistoryView() {
       const container = document.getElementById('auditLogContainer');
       if (!container) return;
@@ -2023,18 +2253,18 @@
       }
 
       if (list.length === 0) {
-        container.innerHTML = `<p class="text-xs text-neutral-500 py-6 text-center">No activity history recorded.</p>`;
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-500 text-xs">No activity history recorded.</div>`;
         return;
       }
 
       container.innerHTML = list.map(item => `
-        <div class="bg-neutral-900/80 border border-neutral-800 p-3 rounded-2xl space-y-1">
+        <div class="bg-neutral-900/80 border border-neutral-800 p-3.5 rounded-2xl space-y-1.5 shadow">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-neutral-100">${item.title}</span>
             <span class="text-[10px] text-neutral-500 font-mono-num">${new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
-          <p class="text-[11px] text-neutral-400">${item.details}</p>
-          <span class="text-[10px] text-amber-400 block font-semibold">By: ${item.user || 'Staff'}</span>
+          <p class="text-xs text-neutral-400">${item.details}</p>
+          <span class="text-[10px] text-amber-400 block font-bold">By: ${item.user || 'Staff'}</span>
         </div>
       `).join('');
     }
@@ -2073,7 +2303,7 @@
       document.getElementById('lockGateScreen')?.classList.add('hidden');
       pinInput.value = '';
 
-      logAudit('auth', `Terminal Unlocked`, `Staff: ${user.name}`);
+      logAudit('auth', `Terminal Unlocked`, `Person: ${user.name}`);
       triggerToast(`Welcome ${user.name}!`);
     }
 
@@ -2122,12 +2352,25 @@
       views.forEach(v => {
         const el = document.getElementById(`view${v.charAt(0).toUpperCase() + v.slice(1)}`);
         const navEl = document.getElementById(`tabNav-${v}`);
+        const topNavEl = document.getElementById(`topTabNav-${v}`);
+
         if (el) el.classList.toggle('hidden', v !== tab);
+
+        /* Mobile bottom navigation */
         if (navEl) {
           if (v === tab) {
             navEl.className = 'flex flex-col items-center gap-0.5 py-1 text-amber-400 transition';
           } else {
             navEl.className = 'flex flex-col items-center gap-0.5 py-1 text-neutral-400 hover:text-neutral-200 transition';
+          }
+        }
+
+        /* Desktop top navigation */
+        if (topNavEl) {
+          if (v === tab) {
+            topNavEl.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 shadow transition';
+          } else {
+            topNavEl.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-100 transition';
           }
         }
       });
@@ -2213,9 +2456,9 @@
         const btn = document.getElementById(`btnPay${m.charAt(0).toUpperCase() + m.slice(1)}`);
         if (btn) {
           if (m === mode) {
-            btn.className = 'py-2 rounded-xl bg-amber-500 text-neutral-950 flex items-center justify-center gap-1 border border-amber-500';
+            btn.className = 'py-2.5 rounded-xl bg-amber-500 text-neutral-950 flex items-center justify-center gap-1.5 border border-amber-500 transition';
           } else {
-            btn.className = 'py-2 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1 border border-neutral-800';
+            btn.className = 'py-2.5 rounded-xl bg-neutral-950 text-neutral-300 flex items-center justify-center gap-1.5 border border-neutral-800 transition';
           }
         }
       });
@@ -2260,8 +2503,8 @@
         const btn = document.getElementById(`stockFilter${s.charAt(0).toUpperCase() + s.slice(1)}`);
         if (btn) {
           btn.className = s === status 
-            ? 'px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium'
-            : 'px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium';
+            ? 'px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold'
+            : 'px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium';
         }
       });
       renderStockView();
@@ -2349,8 +2592,8 @@
       if (!list) return;
 
       list.innerHTML = freebieStagingItems.map(item => `
-        <div class="flex items-center justify-between text-xs py-1 border-b border-neutral-900">
-          <span class="text-neutral-200 truncate">${item.name}</span>
+        <div class="flex items-center justify-between text-xs py-1.5 border-b border-neutral-900">
+          <span class="text-neutral-200 truncate font-semibold">${item.name}</span>
           <span class="font-mono-num text-amber-400 font-bold">${item.qty} boxes</span>
         </div>
       `).join('');
@@ -2377,8 +2620,8 @@
         if (btn) {
           const isMatch = (type === 'all' && t === 'all') || (type === 'expense' && t === 'exp') || (type === t);
           btn.className = isMatch
-            ? 'px-3 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 font-medium'
-            : 'px-3 py-1 rounded-lg bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium';
+            ? 'px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold'
+            : 'px-3.5 py-1.5 rounded-xl bg-neutral-900 text-neutral-400 border border-neutral-800 font-medium';
         }
       });
       renderHistoryView();
@@ -2403,8 +2646,14 @@
     window.closeEditBillDrawer = function() {
       document.getElementById('editBillDrawer')?.classList.add('hidden');
     };
+    window.addCrackerToEditBill = addCrackerToEditBill;
+    window.removeCrackerFromEditBill = removeCrackerFromEditBill;
     window.updateEditBillQty = updateEditBillQty;
+    window.calcEditBillTotals = calcEditBillTotals;
     window.saveActiveEditedBill = saveActiveEditedBill;
+    window.promptDeleteActiveBill = promptDeleteActiveBill;
+    window.cancelDeleteActiveBill = cancelDeleteActiveBill;
+    window.confirmDeleteActiveBill = confirmDeleteActiveBill;
 
     window.openCategoryModal = function() {
       document.getElementById('categoryModal')?.classList.remove('hidden');
@@ -2443,7 +2692,7 @@
       const list = document.getElementById('staffUsersList');
       if (list) {
         list.innerHTML = usersDb.map(u => `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-neutral-950 border border-neutral-800 text-xs">
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-xs">
             <span class="font-bold text-neutral-200">${u.name}</span>
             <span class="font-mono text-neutral-500">PIN: ••••</span>
           </div>
