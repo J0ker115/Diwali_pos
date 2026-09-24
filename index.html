@@ -1066,31 +1066,26 @@
       getDocs 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Firebase Web App configuration embedded for zero-setup multi-phone sync on GitHub Pages
-    const firebaseConfig = {
-    apiKey: "AIzaSyAGv9KXXchMbtvTsw362N9hR6q0qNOhWr0",
-    authDomain: "diwali-3bf4f.firebaseapp.com",
-    projectId: "diwali-3bf4f",
-    storageBucket: "diwali-3bf4f.firebasestorage.app",
-    messagingSenderId: "245741985797",
-    appId: "1:245741985797:web:28ec8a483df7cb6324fc6c"
-  };
-
-    // Application ID and Cloud Environment Config
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'karan-fataka-stall-pos';
+    // Embedded Firebase project configuration (diwali-3bf4f)
+    const CUSTOM_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAGv9KXXchMbtvTsw362N9hR6q0qNOhWr0",
+      authDomain: "diwali-3bf4f.firebaseapp.com",
+      projectId: "diwali-3bf4f",
+      storageBucket: "diwali-3bf4f.firebasestorage.app",
+      messagingSenderId: "245741985797",
+      appId: "1:245741985797:web:28ec8a483df7cb6324fc6c"
+    };
 
     function getActiveFirebaseConfig() {
-      if (CUSTOM_FIREBASE_CONFIG && typeof CUSTOM_FIREBASE_CONFIG === 'object') {
+      // Prioritize embedded diwali-3bf4f config over any cached local storage
+      if (CUSTOM_FIREBASE_CONFIG && CUSTOM_FIREBASE_CONFIG.projectId === "diwali-3bf4f") {
         return CUSTOM_FIREBASE_CONFIG;
-      }
-      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try { return JSON.parse(__firebase_config); } catch (e) {}
       }
       const savedConfig = localStorage.getItem('karan_fataka_firebase_config');
       if (savedConfig) {
         try { return JSON.parse(savedConfig); } catch (e) {}
       }
-      return null;
+      return CUSTOM_FIREBASE_CONFIG;
     }
 
     let firebaseConfig = getActiveFirebaseConfig();
@@ -1130,69 +1125,53 @@
     };
 
     function getColRef(colName) {
-      return collection(db, 'artifacts', appId, 'public', 'data', colName);
+      return collection(db, colName);
     }
 
     function getDocRef(colName, docId) {
-      return doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
+      return doc(db, colName, docId);
     }
 
     async function initCloudSync() {
+      // Clean up any stale configuration from previous experiments
+      const stored = localStorage.getItem('karan_fataka_firebase_config');
+      if (stored && stored.includes('diwali-final')) {
+        localStorage.removeItem('karan_fataka_firebase_config');
+      }
+
       firebaseConfig = getActiveFirebaseConfig();
       if (!firebaseConfig) {
-        console.warn("Cloud config not detected, operating in offline fallback mode.");
-        setCloudStatus(false, "OFFLINE (TAP TO CONNECT)");
+        setCloudStatus(false, "OFFLINE");
         updateUserHeaderUI();
         updateBrandUI();
         renderAllViews();
         return;
       }
 
-      // Always render offline/cached state immediately so UI is never blank
-      updateUserHeaderUI();
-      updateBrandUI();
-      renderAllViews();
-
       try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
 
-        let signedIn = false;
-
-        // Only try custom token if NOT using custom project config
-        if (!CUSTOM_FIREBASE_CONFIG && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
+        // Authenticate anonymously or with custom token if available
+        try {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
             const cred = await signInWithCustomToken(auth, __initial_auth_token);
             currentUserAuth = cred.user;
-            signedIn = true;
-          } catch (tokenErr) {
-            console.warn("Custom token sign-in skipped:", tokenErr);
-          }
-        }
-
-        // Try anonymous sign-in if not signed in yet
-        if (!signedIn) {
-          try {
+          } else {
             const cred = await signInAnonymously(auth);
             currentUserAuth = cred.user;
-            signedIn = true;
-          } catch (anonErr) {
-            console.warn("Firebase Auth note: Anonymous login not enabled yet in Firebase Console.", anonErr.message);
           }
+        } catch (authErr) {
+          console.warn("Auth initialization notice:", authErr?.message || authErr);
         }
 
-        if (signedIn) {
-          setCloudStatus(true, "CLOUD LIVE");
-        } else {
-          setCloudStatus(false, "OFFLINE (AUTH PENDING)");
-        }
-
-        // Attempt realtime subscriptions (or fallback if rules allow unauthenticated)
+        setCloudStatus(true, "CLOUD LIVE");
         setupRealtimeSubscriptions();
       } catch (err) {
-        console.warn("Cloud initialization warning, operating locally:", err.message);
-        setCloudStatus(false, "OFFLINE MODE");
+        console.error("Cloud initialization error:", err);
+        setCloudStatus(false, "RECONNECT");
+        renderAllViews();
       }
     }
 
